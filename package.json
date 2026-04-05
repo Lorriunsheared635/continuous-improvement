@@ -1,5 +1,5 @@
 {
-  "name": "continuous-improve-skill",
+  "name": "continuous-improvement",
   "version": "2.1.0",
   "description": "7-law discipline framework with auto-leveling instinct learning for AI agents — research, plan, execute, verify, reflect, learn, iterate",
   "keywords": [
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/naimkatiman/continuous-improvement#readme",
   "bin": {
-    "continuous-improve": "./bin/install.mjs"
+    "continuous-improvement": "./bin/install.mjs"
   },
   "files": [
     "SKILL.md",

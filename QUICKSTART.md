@@ -1,4 +1,4 @@
-# Quickstart — continuous-improve
+# Quickstart — continuous-improvement
 
 Zero to working in under 2 minutes.
 
@@ -7,10 +7,10 @@ Zero to working in under 2 minutes.
 ## Step 1: Install
 
 ```bash
-npx continuous-improve-skill
+npx continuous-improvement install
 ```
 
-This auto-detects your setup. For Claude Code, it installs the skill, hooks, and `/continuous-improve` command.
+This auto-detects your setup. For Claude Code, it installs the skill, hooks, and `/continuous-improvement` command.
 
 ---
 
@@ -19,14 +19,14 @@ This auto-detects your setup. For Claude Code, it installs the skill, hooks, and
 Give your agent a task and prefix it:
 
 ```
-Use the continuous-improve framework to [your task here].
+Use the continuous-improvement framework to [your task here].
 ```
 
 Examples:
 ```
-Use the continuous-improve framework to add pagination to the users API endpoint.
-Use the continuous-improve framework to debug why the login form breaks on mobile.
-Use the continuous-improve framework to refactor the payment module to use the new SDK.
+Use the continuous-improvement framework to add pagination to the users API endpoint.
+Use the continuous-improvement framework to debug why the login form breaks on mobile.
+Use the continuous-improvement framework to refactor the payment module to use the new SDK.
 ```
 
 Your agent will research, plan, execute one thing at a time, verify, and reflect.
@@ -38,7 +38,7 @@ Your agent will research, plan, execute one thing at a time, verify, and reflect
 After completing non-trivial work:
 
 ```
-/continuous-improve
+/continuous-improvement
 ```
 
 This shows what the system has learned — instincts, confidence levels, and the current auto-level.

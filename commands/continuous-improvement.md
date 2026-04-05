@@ -1,9 +1,9 @@
 ---
-name: continuous-improve
+name: continuous-improvement
 description: "Reflect on the current session, analyze observations for patterns, and show instinct status. Run after finishing significant work."
 ---
 
-# /continuous-improve
+# /continuous-improvement
 
 Run this after completing significant work. It does three things in order.
 
@@ -44,7 +44,7 @@ If fewer than 20 observations, skip analysis and note the count.
 Display all instincts for the current project + global:
 
 ```
-=== continuous-improve ===
+=== continuous-improvement ===
 
 ## Level: [CAPTURE | ANALYZE | SUGGEST | AUTO-APPLY]
 

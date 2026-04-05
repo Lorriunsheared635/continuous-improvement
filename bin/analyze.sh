@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # analyze.sh — Read observations.jsonl, detect patterns, append rules to rules.md
-# This is the actual analysis pipeline. Runs via /continuous-improve or observer-loop.
+# This is the actual analysis pipeline. Runs via /continuous-improvement or observer-loop.
 # Uses claude CLI with Haiku for cost-efficient analysis.
 
 set -euo pipefail

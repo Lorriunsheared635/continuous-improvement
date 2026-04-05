@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# continuous-improve-skill — one-line installer (SKILL.md only)
-# Usage: curl -fsSL https://raw.githubusercontent.com/naimkatiman/continuous-improve-skill/main/install.sh | bash
+# continuous-improvement — one-line installer (SKILL.md only)
+# Usage: curl -fsSL https://raw.githubusercontent.com/naimkatiman/continuous-improvement/main/install.sh | bash
 #
 # For full Mulahazah instinct-learning support (hooks, observer, settings patch):
-#   npx continuous-improve-skill --target claude
+#   npx continuous-improvement install --target claude
 
 set -euo pipefail
 
-SKILL_NAME="continuous-improve"
-RAW_URL="https://raw.githubusercontent.com/naimkatiman/continuous-improve-skill/main/SKILL.md"
+SKILL_NAME="continuous-improvement"
+RAW_URL="https://raw.githubusercontent.com/naimkatiman/continuous-improvement/main/SKILL.md"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║          continuous-improve-skill v2.0 installer             ║"
+echo "║          continuous-improvement v2.0 installer             ║"
 echo "║   Research → Plan → Execute → Verify → Reflect → Learn →    ║"
 echo "║   Iterate  —  7 Laws + Mulahazah instinct learning           ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
@@ -65,12 +65,12 @@ echo "✅ Installed SKILL.md to $installed target(s)."
 echo ""
 echo "Next steps:"
 echo '  1. Start a new agent session'
-echo '  2. Say: "Use the continuous-improve framework to [your task]"'
+echo '  2. Say: "Use the continuous-improvement framework to [your task]"'
 echo '  3. Watch the 7-Law loop in action'
-echo '  4. After your first task, run: /continuous-improve'
+echo '  4. After your first task, run: /continuous-improvement'
 echo ""
 echo "For full Mulahazah instinct-learning support (Claude Code only):"
-echo "  npx continuous-improve-skill --target claude"
+echo "  npx continuous-improvement install --target claude"
 echo ""
-echo "Docs: https://github.com/naimkatiman/continuous-improve-skill"
+echo "Docs: https://github.com/naimkatiman/continuous-improvement"
 echo ""

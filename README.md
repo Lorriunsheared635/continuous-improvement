@@ -24,28 +24,28 @@ This skill fixes that with **7 laws** and a **learning system** that auto-levels
 ## Install
 
 ```bash
-npx continuous-improve-skill
+npx continuous-improvement install
 ```
 
 That's it. For Claude Code, this also installs:
 - Observation hooks (captures every tool call, <50ms, jq optional)
-- `/continuous-improve` command
+- `/continuous-improvement` command
 - Auto-leveling instinct system
 
 Install to a specific target:
 
 ```bash
-npx continuous-improve-skill --target claude    # Claude Code + Mulahazah
-npx continuous-improve-skill --target openclaw  # OpenClaw (skill only)
-npx continuous-improve-skill --target cursor    # Cursor (skill only)
-npx continuous-improve-skill --target all       # All targets
+npx continuous-improvement install --target claude    # Claude Code + Mulahazah
+npx continuous-improvement install --target openclaw  # OpenClaw (skill only)
+npx continuous-improvement install --target cursor    # Cursor (skill only)
+npx continuous-improvement install --target all       # All targets
 ```
 
 ### Manual install
 
 ```bash
-mkdir -p ~/.claude/skills/continuous-improve && \
-curl -fsSL -o ~/.claude/skills/continuous-improve/SKILL.md \
+mkdir -p ~/.claude/skills/continuous-improvement && \
+curl -fsSL -o ~/.claude/skills/continuous-improvement/SKILL.md \
   https://raw.githubusercontent.com/naimkatiman/continuous-improvement/main/SKILL.md
 ```
 
@@ -102,7 +102,7 @@ Install:       Hooks start capturing silently. You notice nothing.
 ### Check what your agent has learned
 
 ```
-/continuous-improve
+/continuous-improvement
 ```
 
 ---
@@ -110,9 +110,9 @@ Install:       Hooks start capturing silently. You notice nothing.
 ## Files
 
 ```
-continuous-improve-skill/
+continuous-improvement/
 ├── SKILL.md                    # The 7 Laws + instinct behavior
-├── commands/continuous-improve.md  # The /continuous-improve command
+├── commands/continuous-improvement.md  # The /continuous-improvement command
 ├── hooks/observe.sh            # Observation hook (pure bash)
 ├── bin/install.mjs             # CLI installer
 ├── QUICKSTART.md               # First-use guide
@@ -123,8 +123,8 @@ continuous-improve-skill/
 ### What gets installed where (Claude Code)
 
 ```
-~/.claude/skills/continuous-improve/SKILL.md     # The skill
-~/.claude/commands/continuous-improve.md          # The command
+~/.claude/skills/continuous-improvement/SKILL.md     # The skill
+~/.claude/commands/continuous-improvement.md          # The command
 ~/.claude/instincts/
 ├── observe.sh                                    # Hook script
 ├── global/                                       # Global instincts (*.yaml)
@@ -139,7 +139,7 @@ continuous-improve-skill/
 ## Uninstall
 
 ```bash
-npx continuous-improve-skill --uninstall
+npx continuous-improvement install --uninstall
 ```
 
 ---

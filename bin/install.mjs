@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * continuous-improve-skill installer
+ * continuous-improvement installer
  *
  * Usage:
- *   npx continuous-improve-skill                # auto-detect & install
- *   npx continuous-improve-skill --target claude # install to ~/.claude/skills/ + Mulahazah
- *   npx continuous-improve-skill --target openclaw # install to ~/.openclaw/skills/
- *   npx continuous-improve-skill --target cursor # install to ~/.cursor/skills/
- *   npx continuous-improve-skill --target all    # install to all detected targets
- *   npx continuous-improve-skill --uninstall     # remove from all targets
+ *   npx continuous-improvement install                # auto-detect & install
+ *   npx continuous-improvement install --target claude # install to ~/.claude/skills/ + Mulahazah
+ *   npx continuous-improvement install --target openclaw # install to ~/.openclaw/skills/
+ *   npx continuous-improvement install --target cursor # install to ~/.cursor/skills/
+ *   npx continuous-improvement install --target all    # install to all detected targets
+ *   npx continuous-improvement install --uninstall     # remove from all targets
  */
 
 import {
@@ -28,7 +28,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const SKILL_SOURCE = join(__dirname, "..", "SKILL.md");
-const SKILL_NAME = "continuous-improve";
+const SKILL_NAME = "continuous-improvement";
 const REPO_ROOT = join(__dirname, "..");
 
 const TARGETS = {
@@ -103,14 +103,14 @@ function setupMulahazah() {
     console.log(`  ✓ observe.sh → ${observeDest}`);
   }
 
-  // 3. Copy /continuous-improve command
+  // 3. Copy /continuous-improvement command
   const commandsDir = join(home, ".claude", "commands");
   mkdirSync(commandsDir, { recursive: true });
-  const cmdSrc = join(REPO_ROOT, "commands", "continuous-improve.md");
-  const cmdDest = join(commandsDir, "continuous-improve.md");
+  const cmdSrc = join(REPO_ROOT, "commands", "continuous-improvement.md");
+  const cmdDest = join(commandsDir, "continuous-improvement.md");
   if (existsSync(cmdSrc)) {
     copyFileSync(cmdSrc, cmdDest);
-    console.log(`  ✓ /continuous-improve command → ${cmdDest}`);
+    console.log(`  ✓ /continuous-improvement command → ${cmdDest}`);
   }
 
   // 4. Patch ~/.claude/settings.json with hooks
@@ -168,7 +168,7 @@ function patchClaudeSettings(observePath) {
 }
 
 function uninstallAll() {
-  console.log("\nUninstalling continuous-improve skill...\n");
+  console.log("\nUninstalling continuous-improvement skill...\n");
   let removed = 0;
   for (const [key, target] of Object.entries(TARGETS)) {
     const skillFile = join(target.dir, "SKILL.md");
@@ -190,7 +190,7 @@ function uninstallAll() {
 
 function printUsage() {
   console.log(`
-Usage: npx continuous-improve-skill [options]
+Usage: npx continuous-improvement install [options]
 
 Options:
   --target <name>   Install to specific target (claude, openclaw, cursor, codex, all)
@@ -198,9 +198,9 @@ Options:
   --help            Show this help
 
 Examples:
-  npx continuous-improve-skill              # auto-detect & install
-  npx continuous-improve-skill --target all  # install everywhere
-  npx continuous-improve-skill --uninstall   # remove all
+  npx continuous-improvement install              # auto-detect & install
+  npx continuous-improvement install --target all  # install everywhere
+  npx continuous-improvement install --uninstall   # remove all
 `);
 }
 
@@ -219,7 +219,7 @@ if (args.includes("--uninstall")) {
 }
 
 console.log(`
-continuous-improve-skill v2.1
+continuous-improvement v2.1
 Research → Plan → Execute → Verify → Reflect → Learn → Iterate
 `);
 
@@ -261,6 +261,6 @@ ${installed > 0 ? "Done." : "Failed."} Installed to ${installed}/${targets.lengt
 ${hasClaude ? "\nHooks are capturing. System auto-levels as you use it." : ""}
 Next steps:
   1. Start a new Claude Code session
-  2. Say: "Use the continuous-improve framework to [your task]"
-  3. After your first task, run: /continuous-improve
+  2. Say: "Use the continuous-improvement framework to [your task]"
+  3. After your first task, run: /continuous-improvement
 `);

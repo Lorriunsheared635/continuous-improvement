@@ -2,15 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Upgrade continuous-improve from a static 6-law discipline framework to a 7-law learning system with instinct-based behavioral observation, project-scoped learning, and a background Haiku observer.
+**Goal:** Upgrade continuous-improvement from a static 6-law discipline framework to a 7-law learning system with instinct-based behavioral observation, project-scoped learning, and a background Haiku observer.
 
-**Architecture:** Hooks (observe.sh) capture every tool call as JSONL. A background Haiku agent periodically analyzes observations to create instincts. Law 5 reflections also feed instincts at higher confidence. One master command (`/continuous-improve`) surfaces everything. Instincts are project-scoped by default with graduated behavior (silent/suggest/auto-apply).
+**Architecture:** Hooks (observe.sh) capture every tool call as JSONL. A background Haiku agent periodically analyzes observations to create instincts. Law 5 reflections also feed instincts at higher confidence. One master command (`/continuous-improvement`) surfaces everything. Instincts are project-scoped by default with graduated behavior (silent/suggest/auto-apply).
 
 **Tech Stack:** Bash (hooks, observer scripts), Node.js (installer), YAML (instincts), JSONL (observations), Markdown (SKILL.md, observer prompt)
 
 ---
 
-## Phase 1: Update continuous-improve Repo
+## Phase 1: Update continuous-improvement Repo
 
 ### File Map
 
@@ -21,7 +21,7 @@
 | Create | `agents/observer-loop.sh` | Periodic loop that launches observer agent |
 | Create | `agents/start-observer.sh` | Launcher — starts loop, writes PID |
 | Create | `config.json` | Default observer configuration |
-| Modify | `skills/continuous-improve/SKILL.md` | Upgrade from 6 Laws to 7 Laws + instinct behavior |
+| Modify | `skills/continuous-improvement/SKILL.md` | Upgrade from 6 Laws to 7 Laws + instinct behavior |
 | Modify | `scripts/install.js` | Add hook installation, directory setup, observer files |
 | Modify | `package.json` | Bump version, add new files to `files` array |
 | Modify | `README.md` | Document Mulahazah, Law 7, new install flow |
@@ -536,29 +536,29 @@ git commit -m "feat: add default Mulahazah observer config"
 ### Task 5: Upgrade SKILL.md to 7 Laws
 
 **Files:**
-- Modify: `skills/continuous-improve/SKILL.md`
+- Modify: `skills/continuous-improvement/SKILL.md`
 
 - [ ] **Step 1: Read the current SKILL.md to confirm starting state**
 
 ```bash
-cat skills/continuous-improve/SKILL.md
+cat skills/continuous-improvement/SKILL.md
 ```
 
 Expected: 6 Laws, ending with "The Loop" section.
 
 - [ ] **Step 2: Replace SKILL.md with the 7-Law version**
 
-Write the complete new `skills/continuous-improve/SKILL.md`:
+Write the complete new `skills/continuous-improvement/SKILL.md`:
 
 ```markdown
 ---
-name: continuous-improve
+name: continuous-improvement
 description: "Install structured self-improvement loops with instinct-based learning into Claude Code — research, plan, execute, verify, reflect, learn, iterate. Mulahazah observes your sessions and builds behavioral instincts with confidence scoring."
 ---
 
-# continuous-improve
+# continuous-improvement
 
-You follow the continuous-improve framework. These 7 laws govern all your work.
+You follow the continuous-improvement framework. These 7 laws govern all your work.
 
 ## Law 1: Research Before Executing
 
@@ -648,9 +648,9 @@ Research → Plan → Execute (one thing) → Verify → Reflect → Learn → I
 
 If you're skipping a step, that's the step you need most.
 
-## /continuous-improve Command
+## /continuous-improvement Command
 
-Run `/continuous-improve` after completing significant work. It provides:
+Run `/continuous-improvement` after completing significant work. It provides:
 
 1. **Reflect** — Generate Law 5 reflection for the session
 2. **Analyze** — Process pending observations into instincts
@@ -658,24 +658,24 @@ Run `/continuous-improve` after completing significant work. It provides:
 4. **Suggest** — Surface actionable insights
 
 Subcommands:
-- `/continuous-improve status` — Instinct overview only
-- `/continuous-improve projects` — List all known projects
-- `/continuous-improve analyze` — Force analysis of pending observations
-- `/continuous-improve reflect` — Trigger reflection manually
+- `/continuous-improvement status` — Instinct overview only
+- `/continuous-improvement projects` — List all known projects
+- `/continuous-improvement analyze` — Force analysis of pending observations
+- `/continuous-improvement reflect` — Trigger reflection manually
 ```
 
 - [ ] **Step 3: Verify the new SKILL.md is valid**
 
 ```bash
-head -3 skills/continuous-improve/SKILL.md
+head -3 skills/continuous-improvement/SKILL.md
 ```
 
-Expected: YAML frontmatter with `name: continuous-improve`.
+Expected: YAML frontmatter with `name: continuous-improvement`.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add skills/continuous-improve/SKILL.md
+git add skills/continuous-improvement/SKILL.md
 git commit -m "feat: upgrade SKILL.md from 6 Laws to 7 Laws with Mulahazah instinct behavior"
 ```
 
@@ -704,7 +704,7 @@ cat scripts/install.js
 Replace the `CODING_AGENT_BLOCK` constant in `scripts/install.js` with:
 
 ```javascript
-const CODING_AGENT_BLOCK = `## Operating Rules (continuous-improve)
+const CODING_AGENT_BLOCK = `## Operating Rules (continuous-improvement)
 
 1. RESEARCH before executing — check docs, rate limits, existing implementations
 2. PLAN before coding — write what you will build, what you won't, how to verify, and fallback
@@ -889,7 +889,7 @@ function installTarget(target) {
 Replace the result logging section at the bottom of install.js:
 
 ```javascript
-console.log(`continuous-improve ${command}\n`);
+console.log(`continuous-improvement ${command}\n`);
 for (const result of results) {
   if (result.printed) {
     console.log(`✓ ${result.target}: copy this into ChatGPT Custom Instructions\n`);
@@ -915,7 +915,7 @@ for (const result of results) {
 }
 
 if (command === 'install' && results.some((r) => r.target === 'claude' || r.target === 'claude-global')) {
-  console.log(`\n  Run /continuous-improve after your next session to see what was learned.`);
+  console.log(`\n  Run /continuous-improvement after your next session to see what was learned.`);
 }
 ```
 
@@ -1013,12 +1013,12 @@ git commit -m "feat: update installer with Mulahazah hooks, directory setup, and
 
 ```json
 {
-  "name": "continuous-improve",
+  "name": "continuous-improvement",
   "version": "1.0.0",
   "description": "Install structured self-improvement loops with instinct-based learning into Claude Code — research, plan, execute, verify, reflect, learn, iterate.",
   "license": "MIT",
   "bin": {
-    "continuous-improve": "scripts/install.js"
+    "continuous-improvement": "scripts/install.js"
   },
   "files": [
     "scripts/",
@@ -1053,13 +1053,13 @@ git commit -m "chore: bump to v1.0.0, add hooks/agents/config to package files"
 
 - [ ] **Step 1: Write updated README.md**
 
-Update the README to document Mulahazah, Law 7, the instinct system, and the `/continuous-improve` command. Keep the existing install flow but add the new capabilities.
+Update the README to document Mulahazah, Law 7, the instinct system, and the `/continuous-improvement` command. Keep the existing install flow but add the new capabilities.
 
 Key sections to add/update:
 - Mention "7 rules" instead of "6 rules"
 - Add Law 7 to the rules list
 - Add "What's new in v1.0" section describing Mulahazah
-- Document `/continuous-improve` command
+- Document `/continuous-improvement` command
 - Document the instinct system briefly
 - Add "Background Observer" section
 - Keep all existing install/uninstall commands
@@ -1069,7 +1069,7 @@ The README should remain sharp and opinionated. Add this section after the exist
 ```markdown
 ## What's new in v1.0: Mulahazah
 
-Mulahazah (Arabic: observation) adds **instinct-based learning** to continuous-improve.
+Mulahazah (Arabic: observation) adds **instinct-based learning** to continuous-improvement.
 
 Your agent doesn't just follow rules — it learns from every session:
 
@@ -1082,7 +1082,7 @@ Your agent doesn't just follow rules — it learns from every session:
 One command to see everything:
 
 ```bash
-/continuous-improve
+/continuous-improvement
 ```
 
 ### Background Observer
@@ -1093,7 +1093,7 @@ Optionally run a background Haiku agent that continuously analyzes your sessions
 ~/.claude/mulahazah/agents/start-observer.sh
 ```
 
-The observer creates instincts automatically. Without it, learning happens on-demand when you run `/continuous-improve`.
+The observer creates instincts automatically. Without it, learning happens on-demand when you run `/continuous-improvement`.
 
 ## The 7 rules
 
@@ -1183,7 +1183,7 @@ git commit -m "feat: add Law 7 to all prompt variants"
 - [ ] **Step 1: Check all files are present**
 
 ```bash
-ls -la hooks/observe.sh agents/observer.md agents/observer-loop.sh agents/start-observer.sh config.json skills/continuous-improve/SKILL.md scripts/install.js package.json README.md
+ls -la hooks/observe.sh agents/observer.md agents/observer-loop.sh agents/start-observer.sh config.json skills/continuous-improvement/SKILL.md scripts/install.js package.json README.md
 ```
 
 Expected: All files exist with correct permissions.
@@ -1317,11 +1317,11 @@ See `install-mulahazah.md` for the installation protocol.
 
 | Command | Description |
 |---------|-------------|
-| `/continuous-improve` | Full dashboard — reflect, analyze, status, suggestions |
-| `/continuous-improve status` | Instinct overview (project + global) |
-| `/continuous-improve projects` | List known projects and instinct counts |
-| `/continuous-improve analyze` | Force analysis of pending observations |
-| `/continuous-improve reflect` | Trigger reflection manually |
+| `/continuous-improvement` | Full dashboard — reflect, analyze, status, suggestions |
+| `/continuous-improvement status` | Instinct overview (project + global) |
+| `/continuous-improvement projects` | List known projects and instinct counts |
+| `/continuous-improvement analyze` | Force analysis of pending observations |
+| `/continuous-improvement reflect` | Trigger reflection manually |
 ```
 
 - [ ] **Step 3: Write install-mulahazah.md**
@@ -1412,24 +1412,24 @@ ls ~/.claude/mulahazah/projects/
 You should see a project directory with observations.
 ```
 
-- [ ] **Step 4: Copy observe.sh from continuous-improve**
+- [ ] **Step 4: Copy observe.sh from continuous-improvement**
 
 ```bash
-cp /home/naim/.openclaw/workspace/continuous-improve/hooks/observe.sh Feature/Mulahazah-System/hooks/observe.sh
+cp /home/naim/.openclaw/workspace/continuous-improvement/hooks/observe.sh Feature/Mulahazah-System/hooks/observe.sh
 ```
 
-- [ ] **Step 5: Copy observer agent files from continuous-improve**
+- [ ] **Step 5: Copy observer agent files from continuous-improvement**
 
 ```bash
-cp /home/naim/.openclaw/workspace/continuous-improve/agents/observer.md Feature/Mulahazah-System/agents/observer.md
-cp /home/naim/.openclaw/workspace/continuous-improve/agents/observer-loop.sh Feature/Mulahazah-System/agents/observer-loop.sh
-cp /home/naim/.openclaw/workspace/continuous-improve/agents/start-observer.sh Feature/Mulahazah-System/agents/start-observer.sh
+cp /home/naim/.openclaw/workspace/continuous-improvement/agents/observer.md Feature/Mulahazah-System/agents/observer.md
+cp /home/naim/.openclaw/workspace/continuous-improvement/agents/observer-loop.sh Feature/Mulahazah-System/agents/observer-loop.sh
+cp /home/naim/.openclaw/workspace/continuous-improvement/agents/start-observer.sh Feature/Mulahazah-System/agents/start-observer.sh
 ```
 
 - [ ] **Step 6: Copy config.json**
 
 ```bash
-cp /home/naim/.openclaw/workspace/continuous-improve/config.json Feature/Mulahazah-System/config.json
+cp /home/naim/.openclaw/workspace/continuous-improvement/config.json Feature/Mulahazah-System/config.json
 ```
 
 - [ ] **Step 7: Write SKILL.md adapted for MemoryCore context**
@@ -1440,7 +1440,7 @@ The SKILL.md for MemoryCore should follow MemoryCore's skill format (activation 
 ---
 name: mulahazah
 description: "Auto-triggers on session start to load instincts, and when user says
-             'continuous-improve', 'instinct status', 'what have you learned',
+             'continuous-improvement', 'instinct status', 'what have you learned',
              'show instincts', 'analyze session', 'reflect on session',
              or when the AI completes a non-trivial task (triggers reflection).
              Also triggers on 'learn from this', 'remember this pattern'."
@@ -1462,7 +1462,7 @@ Then load project-scoped and global instincts from `~/.claude/mulahazah/`.
 | Context | Status |
 |---------|--------|
 | **Session start (any project)** | ACTIVE — load instincts silently |
-| **User says "continuous-improve", "instinct status"** | ACTIVE — show full dashboard |
+| **User says "continuous-improvement", "instinct status"** | ACTIVE — show full dashboard |
 | **User says "analyze session", "what have you learned"** | ACTIVE — run analysis |
 | **After completing non-trivial task** | ACTIVE — trigger reflection + instinct creation |
 | **User says "learn from this", "remember this pattern"** | ACTIVE — create instinct from explicit input |
@@ -1497,7 +1497,7 @@ Parse "Rule to add" into an instinct with 0.6 starting confidence.
 
 ### Step 4: Analyze (On-Demand)
 
-When user runs `/continuous-improve`:
+When user runs `/continuous-improvement`:
 1. Read pending observations
 2. Detect patterns (corrections, errors, repeated workflows, tool preferences)
 3. Create/update instincts
@@ -1546,7 +1546,7 @@ Always search with Grep before editing.
 | **Save Diary** | Include "Session Learning" section in diary with new/updated instincts |
 
 ## Level History
-- **Lv.1** — Base: Hook-based observation (100% reliable), atomic instincts with confidence scoring (0.3-0.9), project-scoped learning, graduated behavior (silent/suggest/auto-apply), background Haiku observer, confidence decay. (Origin: Forked from continuous-improve Mulahazah system, inspired by Homunculus v2 instinct architecture)
+- **Lv.1** — Base: Hook-based observation (100% reliable), atomic instincts with confidence scoring (0.3-0.9), project-scoped learning, graduated behavior (silent/suggest/auto-apply), background Haiku observer, confidence decay. (Origin: Forked from continuous-improvement Mulahazah system, inspired by Homunculus v2 instinct architecture)
 ```
 
 - [ ] **Step 8: Commit all MemoryCore files**
@@ -1624,7 +1624,7 @@ Feature/Mulahazah-System/
 - [ ] Verify project detection creates correct hash from git remote
 - [ ] Start observer with `start-observer.sh` — verify PID file created
 - [ ] Run in a Claude Code session — verify observations accumulate
-- [ ] Run `/continuous-improve` — verify instinct dashboard appears
+- [ ] Run `/continuous-improvement` — verify instinct dashboard appears
 EOF
 )"
 ```
@@ -1637,10 +1637,10 @@ Record the PR URL for tracking.
 
 ### Task 14: Final Verification
 
-- [ ] **Step 1: Return to continuous-improve repo**
+- [ ] **Step 1: Return to continuous-improvement repo**
 
 ```bash
-cd /home/naim/.openclaw/workspace/continuous-improve
+cd /home/naim/.openclaw/workspace/continuous-improvement
 ```
 
 - [ ] **Step 2: Verify git log shows all Phase 1 commits**
@@ -1659,7 +1659,7 @@ npm pack --dry-run
 
 Expected: Lists all files that would be included in the package, including hooks/, agents/, config.json.
 
-- [ ] **Step 4: Push continuous-improve to origin**
+- [ ] **Step 4: Push continuous-improvement to origin**
 
 ```bash
 git push origin main

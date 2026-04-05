@@ -28,7 +28,7 @@ All notable changes to this skill are documented here.
 - SKILL.md rewritten to be honest — removed claims about features that didn't work (YAML instinct auto-loading, graduated confidence enforcement)
 - Law 7 now uses `~/.claude/mulahazah/rules.md` — a markdown file Claude can actually read/write reliably
 - Added `bin/analyze.sh` — the actual analysis pipeline that was missing (calls Haiku to extract rules from observations)
-- Added `commands/continuous-improve.md` — the actual `/continuous-improve` command file
+- Added `commands/continuous-improvement.md` — the actual `/continuous-improvement` command file
 - Installer now copies analyze.sh, command file, and initializes rules.md
 - observer-loop.sh rewritten to use analyze.sh instead of broken YAML instinct pipeline
 - README rewritten to match what the tool actually does
@@ -42,7 +42,7 @@ All notable changes to this skill are documented here.
 - PreToolUse/PostToolUse hooks for session observation
 - Background Haiku observer agent for pattern detection
 - Project-scoped observation (per-project JSONL files)
-- `/continuous-improve` command
+- `/continuous-improvement` command
 - `hooks/observe.sh` — lightweight observation hook (<50ms)
 - `agents/` — observer agent scripts
 - `config.json` — observer configuration

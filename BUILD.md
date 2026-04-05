@@ -147,7 +147,7 @@ The `skills/continuous-improvement/SKILL.md` must be compatible with the OpenCla
 3. `git commit -m "feat: initial release — continuous-improvement v1.0.0"`
 4. Create the GitHub repo: `gh repo create naimkatiman/continuous-improvement --public --description "The missing operating system for AI coding agents"`
 5. `git push -u origin main`
-6. Set topics: `gh repo edit --add-topic "ai-agents,prompt-engineering,claude,codex,llm,system-prompt,continuous-improvementment,coding-agents"`
+6. Set topics: `gh repo edit --add-topic "ai-agents,prompt-engineering,claude,codex,llm,system-prompt,continuous-improvement,coding-agents"`
 
 Then run:
 ```

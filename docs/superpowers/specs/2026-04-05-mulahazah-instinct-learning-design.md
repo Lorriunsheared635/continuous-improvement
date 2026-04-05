@@ -1,4 +1,4 @@
-# Mulahazah: Instinct-Based Learning for continuous-improve
+# Mulahazah: Instinct-Based Learning for continuous-improvement
 
 **Date:** 2026-04-05
 **Status:** Design approved, pending implementation
@@ -8,7 +8,7 @@
 
 ## Summary
 
-Upgrade continuous-improve from a static 7-law framework to a learning system. Hooks silently observe every session. When enough data accumulates, the system auto-promotes itself from passive capture to active suggestions to auto-applied behaviors — no user action required.
+Upgrade continuous-improvement from a static 7-law framework to a learning system. Hooks silently observe every session. When enough data accumulates, the system auto-promotes itself from passive capture to active suggestions to auto-applied behaviors — no user action required.
 
 Codename: **Mulahazah** (Arabic: observation). Self-contained, no external dependencies.
 
@@ -18,7 +18,7 @@ Codename: **Mulahazah** (Arabic: observation). Self-contained, no external depen
 
 1. **Zero config to start** — `npx continuous-improvement install --claude` and you're done
 2. **Auto-level** — the system promotes itself as data accumulates, user never touches a config
-3. **One command to inspect** — `/continuous-improve` shows everything
+3. **One command to inspect** — `/continuous-improvement` shows everything
 4. **No daemons for v1** — analysis runs inline when Claude loads the skill, not in a background process
 5. **Instincts are the only learning unit** — small, atomic, confidence-scored YAML files
 
@@ -101,7 +101,7 @@ Two things feed the instinct store:
 1. **Inline analysis** (automatic at session start when 20+ observations pending)
 2. **Law 5 reflection** ("Rule to add" → instinct at 0.6 confidence)
 
-One command to inspect: `/continuous-improve`
+One command to inspect: `/continuous-improvement`
 
 ---
 
@@ -228,18 +228,18 @@ The "Rule to add" becomes an instinct at 0.6 confidence. If a matching instinct 
 
 ---
 
-## /continuous-improve Command
+## /continuous-improvement Command
 
 ```
-/continuous-improve              # Full: reflect + analyze + status
-/continuous-improve status       # Show instincts only
-/continuous-improve analyze      # Force analysis now
+/continuous-improvement              # Full: reflect + analyze + status
+/continuous-improvement status       # Show instincts only
+/continuous-improvement analyze      # Force analysis now
 ```
 
 ### Example output
 
 ```
-=== continuous-improve ===
+=== continuous-improvement ===
 
 ## Level: SUGGEST (12 instincts, 3 suggesting)
 
@@ -272,7 +272,7 @@ The "Rule to add" becomes an instinct at 0.6 confidence. If a matching instinct 
 ### What ships in the package
 
 ```
-continuous-improve/
+continuous-improvement/
 ├── skills/continuous-improvement/SKILL.md   # 7 Laws + instinct behavior
 ├── hooks/observe.sh                         # PreToolUse/PostToolUse hook
 ├── scripts/install.js                       # npx continuous-improvement install
