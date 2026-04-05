@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="promo/combined.gif" alt="Before vs After continuous-improvement" width="700" />
+  <img src="assets/combined.gif" alt="Before vs After continuous-improvement" width="700" />
 </p>
 
 # continuous-improvement

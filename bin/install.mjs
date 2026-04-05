@@ -169,23 +169,82 @@ function patchClaudeSettings(observePath) {
 
 function uninstallAll() {
   console.log("\nUninstalling continuous-improvement skill...\n");
+  const home = homedir();
   let removed = 0;
+
+  // 1. Remove skill files from all targets
   for (const [key, target] of Object.entries(TARGETS)) {
     const skillFile = join(target.dir, "SKILL.md");
     if (existsSync(skillFile)) {
       try {
         rmSync(target.dir, { recursive: true });
-        console.log(`  ✓ Removed from ${target.label}`);
+        console.log(`  ✓ Removed skill from ${target.label}`);
         removed++;
       } catch (err) {
         console.error(`  ✗ ${target.label}: ${err.message}`);
       }
     }
   }
-  if (removed === 0) {
-    console.log("  No installations found.");
+
+  // 2. Remove /continuous-improvement command
+  const cmdFile = join(home, ".claude", "commands", "continuous-improvement.md");
+  if (existsSync(cmdFile)) {
+    try {
+      rmSync(cmdFile);
+      console.log(`  ✓ Removed /continuous-improvement command`);
+    } catch (err) {
+      console.error(`  ✗ Command file: ${err.message}`);
+    }
   }
-  console.log();
+
+  // 3. Remove observe.sh from instincts dir
+  const observeFile = join(home, ".claude", "instincts", "observe.sh");
+  if (existsSync(observeFile)) {
+    try {
+      rmSync(observeFile);
+      console.log(`  ✓ Removed observe.sh`);
+    } catch (err) {
+      console.error(`  ✗ observe.sh: ${err.message}`);
+    }
+  }
+
+  // 4. Remove hooks from settings.json
+  const settingsPath = join(home, ".claude", "settings.json");
+  if (existsSync(settingsPath)) {
+    try {
+      const settings = JSON.parse(readFileSync(settingsPath, "utf8"));
+      let changed = false;
+      for (const hookType of ["PreToolUse", "PostToolUse"]) {
+        if (Array.isArray(settings.hooks?.[hookType])) {
+          const before = settings.hooks[hookType].length;
+          settings.hooks[hookType] = settings.hooks[hookType].filter(
+            (h) =>
+              !(
+                Array.isArray(h.hooks) &&
+                h.hooks.some(
+                  (hh) => hh.command && hh.command.includes("observe.sh")
+                )
+              )
+          );
+          if (settings.hooks[hookType].length < before) changed = true;
+        }
+      }
+      if (changed) {
+        writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n");
+        console.log(`  ✓ Removed hooks from settings.json`);
+      }
+    } catch {
+      console.warn(`  ! Could not clean settings.json — remove hooks manually`);
+    }
+  }
+
+  if (removed === 0) {
+    console.log("  No skill installations found.");
+  }
+  console.log(
+    "\n  Note: Instinct data in ~/.claude/instincts/ was preserved.\n" +
+      "  To remove learned data too: rm -rf ~/.claude/instincts/\n"
+  );
 }
 
 function printUsage() {
@@ -207,10 +266,16 @@ Examples:
 // --- Main ---
 
 const args = process.argv.slice(2);
+const command = args[0];
 
 if (args.includes("--help") || args.includes("-h")) {
   printUsage();
   process.exit(0);
+}
+
+if (!command || !["install", "--help", "-h", "--uninstall"].includes(command)) {
+  printUsage();
+  process.exit(command ? 1 : 0);
 }
 
 if (args.includes("--uninstall")) {
