@@ -17,7 +17,7 @@ describe("commands/discipline.md", () => {
   });
 
   it("has valid frontmatter", () => {
-    assert.match(content, /^---\n/);
+    assert.match(content, /^---\r?\n/);
     assert.match(content, /name: discipline/);
     assert.match(content, /description:/);
   });
@@ -53,7 +53,7 @@ describe("commands/dashboard.md", () => {
   });
 
   it("has valid frontmatter", () => {
-    assert.match(content, /^---\n/);
+    assert.match(content, /^---\r?\n/);
     assert.match(content, /name: dashboard/);
   });
 

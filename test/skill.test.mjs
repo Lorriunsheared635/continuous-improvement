@@ -16,7 +16,7 @@ describe("SKILL.md", () => {
   });
 
   it("has valid frontmatter", () => {
-    assert.match(content, /^---\n/, "Should start with frontmatter");
+    assert.match(content, /^---\r?\n/, "Should start with frontmatter");
     assert.match(content, /name: continuous-improvement/, "Should have name field");
     assert.match(content, /description:/, "Should have description field");
   });

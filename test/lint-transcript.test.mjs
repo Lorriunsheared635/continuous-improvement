@@ -9,9 +9,23 @@ import { fileURLToPath } from "node:url";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const LINTER = join(__dirname, "..", "bin", "lint-transcript.mjs");
 
-describe("lint-transcript.mjs", () => {
-  let tempDir;
+/**
+ * Helper: write events to a temp JSONL file and run the linter on it.
+ * Returns stdout. Avoids printf/pipe issues on Windows.
+ */
+function lintEvents(events, flags = []) {
+  const dir = join(tmpdir(), `ci-lint-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, "transcript.jsonl");
+  writeFileSync(file, events.map((e) => JSON.stringify(e)).join("\n") + "\n");
+  try {
+    return execFileSync("node", [LINTER, file, ...flags], { encoding: "utf8" });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
 
+describe("lint-transcript.mjs", () => {
   it("shows help with --help", () => {
     const output = execFileSync("node", [LINTER, "--help"], { encoding: "utf8" });
     assert.match(output, /Agent Transcript Linter/);
@@ -21,8 +35,17 @@ describe("lint-transcript.mjs", () => {
   });
 
   it("exits 0 with no events from stdin", () => {
-    const output = execSync(`echo '' | node "${LINTER}" --stdin`, { encoding: "utf8" });
-    assert.match(output, /No events found/);
+    // Use a temp file with no valid JSON events
+    const dir = join(tmpdir(), `ci-lint-empty-${Date.now()}`);
+    mkdirSync(dir, { recursive: true });
+    const file = join(dir, "empty.jsonl");
+    writeFileSync(file, "\n");
+    try {
+      const output = execFileSync("node", [LINTER, file], { encoding: "utf8" });
+      assert.match(output, /No events found/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("detects Law 1 violation (writes without research)", () => {
@@ -30,8 +53,7 @@ describe("lint-transcript.mjs", () => {
       { tool: "Write", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
       { tool: "Write", event: "tool_start", tool_input: { file_path: "/tmp/b.ts" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin`, { encoding: "utf8" });
+    const output = lintEvents(events);
     assert.match(output, /Law 1/);
     assert.match(output, /Research Before Executing/);
   });
@@ -42,8 +64,7 @@ describe("lint-transcript.mjs", () => {
       { tool: "Read", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
       { tool: "Write", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --json`, { encoding: "utf8" });
+    const output = lintEvents(events, ["--json"]);
     const result = JSON.parse(output);
     const law1Violations = result.violations.filter((v) => v.law === 1);
     assert.equal(law1Violations.length, 0, "Should have no Law 1 violations");
@@ -54,8 +75,7 @@ describe("lint-transcript.mjs", () => {
       { tool: "Read", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
       { tool: "Edit", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin`, { encoding: "utf8" });
+    const output = lintEvents(events);
     assert.match(output, /Law 4/);
     assert.match(output, /Verify Before Reporting/);
   });
@@ -66,8 +86,7 @@ describe("lint-transcript.mjs", () => {
       { tool: "Edit", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
       { tool: "Bash", event: "tool_start", tool_input: { command: "npm test" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --json`, { encoding: "utf8" });
+    const output = lintEvents(events, ["--json"]);
     const result = JSON.parse(output);
     const law4Violations = result.violations.filter((v) => v.law === 4);
     assert.equal(law4Violations.length, 0, "Should have no Law 4 violations");
@@ -82,8 +101,7 @@ describe("lint-transcript.mjs", () => {
         tool_input: { file_path: `/tmp/file${i}.ts` },
       })),
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin`, { encoding: "utf8" });
+    const output = lintEvents(events);
     assert.match(output, /Law 3/);
   });
 
@@ -91,8 +109,7 @@ describe("lint-transcript.mjs", () => {
     const events = [
       { tool: "Read", event: "tool_start", tool_input: {} },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --json`, { encoding: "utf8" });
+    const output = lintEvents(events, ["--json"]);
     const result = JSON.parse(output);
     assert.ok("violations" in result);
     assert.ok("stats" in result);
@@ -107,14 +124,13 @@ describe("lint-transcript.mjs", () => {
       { tool: "Edit", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
       { tool: "Bash", event: "tool_start", tool_input: { command: "npm test" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --json`, { encoding: "utf8" });
+    const output = lintEvents(events, ["--json"]);
     const result = JSON.parse(output);
     assert.equal(result.score, 100, "Perfect discipline should score 100");
   });
 
   it("reads from file path", () => {
-    tempDir = join(tmpdir(), `ci-lint-test-${Date.now()}`);
+    const tempDir = join(tmpdir(), `ci-lint-test-${Date.now()}`);
     mkdirSync(tempDir, { recursive: true });
     const filePath = join(tempDir, "transcript.jsonl");
     writeFileSync(filePath, '{"tool":"Read","event":"tool_start","tool_input":{}}\n');
@@ -127,10 +143,9 @@ describe("lint-transcript.mjs", () => {
     const events = [
       { tool: "Write", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
     let exitCode = 0;
     try {
-      execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --strict`, { encoding: "utf8" });
+      lintEvents(events, ["--strict"]);
     } catch (err) {
       exitCode = err.status;
     }
@@ -144,8 +159,7 @@ describe("lint-transcript.mjs", () => {
       { tool: "Edit", event: "tool_start", tool_input: { file_path: "/tmp/a.ts" } },
       { tool: "Bash", event: "tool_start", tool_input: { command: "npm test" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --strict`, { encoding: "utf8" });
+    const output = lintEvents(events, ["--strict"]);
     assert.match(output, /No law violations/);
   });
 
@@ -158,8 +172,7 @@ describe("lint-transcript.mjs", () => {
       { tool: "Edit", event: "tool_start", tool_input: { file_path: "/tmp/b.ts" } },
       { tool: "Bash", event: "tool_start", tool_input: { command: "jest" } },
     ];
-    const input = events.map((e) => JSON.stringify(e)).join("\n");
-    const output = execSync(`printf '%s' '${input.replace(/'/g, "'\\''")}' | node "${LINTER}" --stdin --json`, { encoding: "utf8" });
+    const output = lintEvents(events, ["--json"]);
     const result = JSON.parse(output);
     assert.equal(result.stats.researchTools, 3);
     assert.equal(result.stats.writeTools, 2);
