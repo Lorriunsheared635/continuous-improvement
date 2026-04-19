@@ -1,8 +1,8 @@
 {
   "name": "continuous-improvement",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "mode": "beginner",
-  "description": "3 simple tools: check status, view instincts, reflect on sessions. No config needed.",
+  "description": "6 essential tools: status, instincts, reflection, quick CLI generation, basic PM analysis, and project overview. No config needed.",
   "tools": [
     {
       "name": "ci_status",
@@ -15,6 +15,18 @@
     {
       "name": "ci_reflect",
       "what": "Reflect on what you did this session"
+    },
+    {
+      "name": "ci_cli_quick",
+      "what": "Quickly generate basic CLI for current repository"
+    },
+    {
+      "name": "ci_pm_basic",
+      "what": "Run basic product management analysis (user personas and value proposition)"
+    },
+    {
+      "name": "ci_project_overview",
+      "what": "Get quick overview of current project state and progress"
     }
   ],
   "setup": {

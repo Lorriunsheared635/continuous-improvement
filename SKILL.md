@@ -193,3 +193,18 @@ Subcommands:
 - `/continuous-improvement analyze` — Process pending observations into instincts
 - `/continuous-improvement weekly` — Set up weekly analysis schedule
 - `/continuous-improvement always-on` — Enable/disable always-on mode for this project
+
+## Planning-With-Files (Opt-In)
+
+Use this workflow only when the user explicitly asks for persistent, file-based planning or asks to use Planning-With-Files.
+
+- Detect the project root with `git rev-parse --show-toplevel`; if that fails, use the current working directory.
+- Create and maintain three project-root files:
+  - `task_plan.md` — phases, status, questions, decisions, errors
+  - `findings.md` — research notes, sources, synthesized discoveries
+  - `progress.md` — session log, verification notes, checkpoints
+- Default phases in `task_plan.md`: `Research`, `Plan`, `Execute`, `Verify`, `Reflect`
+- Never create these files automatically for normal work. This workflow is opt-in.
+- Never overwrite existing planning files unless the user explicitly asks to reset or replace them.
+
+When resuming work, read the three files before making major decisions so context survives long tasks and new sessions.

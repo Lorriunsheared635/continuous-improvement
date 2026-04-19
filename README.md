@@ -15,7 +15,7 @@
   <a href="https://github.com/naimkatiman/continuous-improvement/network/members"><img src="https://img.shields.io/github/forks/naimkatiman/continuous-improvement?style=social" alt="forks"></a>
   <a href="https://github.com/naimkatiman/continuous-improvement/graphs/contributors"><img src="https://img.shields.io/github/contributors/naimkatiman/continuous-improvement" alt="contributors"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="license"></a>
-  <a href="test/"><img src="https://img.shields.io/badge/tests-104%20passing-brightgreen" alt="tests"></a>
+  <a href="test/"><img src="https://img.shields.io/badge/tests-passing-brightgreen" alt="tests"></a>
 </p>
 
 <p align="center">
@@ -111,7 +111,7 @@ npx continuous-improvement install
 
 That's it. For Claude Code, this installs:
 - Observation hooks (captures every tool call, <50ms, jq optional)
-- `/continuous-improvement`, `/discipline`, and `/dashboard` commands
+- `/continuous-improvement`, `/planning-with-files`, `/discipline`, and `/dashboard` commands
 - Auto-leveling instinct system
 
 ### Expert — full power with MCP server
@@ -121,7 +121,7 @@ npx continuous-improvement install --mode expert
 ```
 
 Everything in beginner plus:
-- **MCP server** with 10 tools (instinct management, import/export, dashboard, instinct packs)
+- **MCP server** with 12 tools (instinct management, planning files, import/export, dashboard, instinct packs)
 - **Session hooks** (auto-load instincts at start, remind to reflect at end)
 - Works with Claude Code, Claude Desktop, and any MCP client
 
@@ -228,9 +228,16 @@ Or in expert mode: use the `ci_load_pack` tool to load packs at any time.
 
 ```
 /continuous-improvement    # Reflect, analyze, show status
+/planning-with-files       # Create or review task_plan.md, findings.md, progress.md
 /discipline                # Quick reference card of the 7 Laws
 /dashboard                 # Visual instinct health dashboard
 ```
+
+### Planning With Files (opt-in)
+
+When a task needs durable working memory on disk, initialize the planning workflow explicitly. It creates `task_plan.md`, `findings.md`, and `progress.md` in the project root and stays inactive unless you ask for it.
+
+In expert mode, the same workflow is available programmatically through `ci_plan_init` and `ci_plan_status`.
 
 ---
 
@@ -280,6 +287,7 @@ Paste SKILL.md into your system prompt. Your agent follows the 7 Laws. No tools,
 |---------|-------------------|--------|
 | Observation hooks | Yes | Yes |
 | `/continuous-improvement` command | Yes | Yes |
+| `/planning-with-files` command | Yes | Yes |
 | `/discipline` quick reference | Yes | Yes |
 | `/dashboard` visual dashboard | Yes | Yes |
 | Auto-leveling instincts | Yes | Yes |
@@ -290,6 +298,7 @@ Paste SKILL.md into your system prompt. Your agent follows the 7 Laws. No tools,
 | `ci_create_instinct` tool | - | Yes |
 | `ci_observations` tool | - | Yes |
 | `ci_export` / `ci_import` | - | Yes |
+| `ci_plan_init` / `ci_plan_status` | - | Yes |
 | `ci_dashboard` tool | - | Yes |
 | `ci_load_pack` tool | - | Yes |
 | Session start/end hooks | - | Yes |
@@ -311,8 +320,16 @@ Paste SKILL.md into your system prompt. Your agent follows the 7 Laws. No tools,
 | `ci_observations` | View raw tool call observations (expert) |
 | `ci_export` | Export instincts as JSON (expert) |
 | `ci_import` | Import instincts from JSON (expert) |
+| `ci_plan_init` | Create project-root planning files for persistent task memory (expert) |
+| `ci_plan_status` | Summarize `task_plan.md`, `findings.md`, and `progress.md` (expert) |
 | `ci_dashboard` | Visual dashboard with confidence distribution (expert) |
 | `ci_load_pack` | Load starter instinct packs (expert) |
+
+### Inspired By Planning-With-Files
+
+This workflow is inspired by the open-source Planning-With-Files pattern:
+- [Skillstore reference](https://skillstore.io/skills/ammarcodes-planning-with-files)
+- [OpenClaw reference](https://www.opclawskills.com/skills/planning-with-files)
 
 ---
 
@@ -333,25 +350,35 @@ Each example shows the same task done with and without the 7 laws, highlighting 
 ```
 continuous-improvement/
 ├── SKILL.md                           # The 7 Laws + instinct behavior
+├── src/
+│   ├── bin/
+│   │   ├── install.mts                # TypeScript source for the installer
+│   │   ├── mcp-server.mts             # TypeScript source for the MCP server
+│   │   └── lint-transcript.mts        # TypeScript source for the transcript linter
+│   └── test/
+│       └── *.test.mts                 # TypeScript source for the Node test suite
 ├── bin/
-│   ├── install.mjs                    # CLI installer (--mode beginner|expert|mcp)
-│   ├── mcp-server.mjs                # MCP server (zero dependencies)
-│   └── lint-transcript.mjs           # Agent transcript linter (GitHub Action)
+│   ├── install.mjs                    # Committed runtime artifact for the installer
+│   ├── mcp-server.mjs                 # Committed runtime artifact for the MCP server
+│   └── lint-transcript.mjs            # Committed runtime artifact for the transcript linter
 ├── hooks/
 │   ├── observe.sh                     # Observation hook (pure bash, <50ms)
 │   └── session.sh                     # Session start/end hook (expert mode)
 ├── plugins/
 │   ├── beginner.json                  # Plugin manifest: 3 tools
-│   └── expert.json                    # Plugin manifest: 10 tools
+│   └── expert.json                    # Plugin manifest: 12 tools
 ├── commands/
 │   ├── continuous-improvement.md     # /continuous-improvement command
+│   ├── planning-with-files.md        # /planning-with-files command
 │   ├── discipline.md                 # /discipline quick reference
 │   └── dashboard.md                  # /dashboard visual display
+├── templates/
+│   └── planning-with-files/          # Project-root planning file templates
 ├── instinct-packs/
 │   ├── react.json                     # React/Next.js starter instincts
 │   ├── python.json                   # Python starter instincts
 │   └── go.json                       # Go starter instincts
-├── test/                              # 104 tests (node --test)
+├── test/                              # Node test suite (node --test)
 ├── examples/                          # Real-world before/after scenarios
 ├── docs/                              # Translations (zh-CN, ja)
 ├── .github/
@@ -373,6 +400,7 @@ continuous-improvement/
 ```
 ~/.claude/skills/continuous-improvement/SKILL.md     # The skill
 ~/.claude/commands/continuous-improvement.md          # The command
+~/.claude/commands/planning-with-files.md            # Planning workflow
 ~/.claude/commands/discipline.md                     # Quick reference
 ~/.claude/commands/dashboard.md                      # Dashboard
 ~/.claude/instincts/
@@ -388,6 +416,13 @@ continuous-improvement/
 ```
 ~/.claude/instincts/session.sh                       # Session hooks
 ~/.claude/settings.json                              # + MCP server + session hooks
+```
+
+When you explicitly initialize file-based planning, the following are created in the project root:
+```
+task_plan.md                                         # Phases, status, decisions, errors
+findings.md                                          # Research notes and sources
+progress.md                                          # Session log and verification notes
 ```
 
 ---
@@ -435,7 +470,7 @@ If your agent says any of these, it's skipping a law:
 ### Phase 1: Foundation -- DONE
 
 - [x] Published to public npm (`npx continuous-improvement install` works)
-- [x] 104-test suite (installer, hook, MCP server, linter, packs, community files)
+- [x] Node test suite (installer, hook, MCP server, linter, packs, community files)
 - [x] Before/after examples in README + `examples/` directory
 - [x] Gemini CLI support
 - [x] Platform badges and improved npm metadata
@@ -443,7 +478,7 @@ If your agent says any of these, it's skipping a law:
 
 ### Phase 2: Plugin Architecture -- DONE
 
-- [x] **MCP server** — 10 tools (beginner: 3, expert: 7 more) with zero dependencies
+- [x] **MCP server** — 12 tools (beginner: 3, expert: 9 more) with zero runtime dependencies
 - [x] **Beginner / Expert separation** — simple defaults, power when you need it
 - [x] **Plugin manifests** — `plugins/beginner.json` and `plugins/expert.json`
 - [x] **Session hooks** — auto-load instincts at session start, remind to reflect at end

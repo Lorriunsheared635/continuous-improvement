@@ -20,7 +20,15 @@ if [[ -z "$PROJECT_ROOT" ]]; then
   PROJECT_ROOT="global"
 fi
 
-PROJECT_HASH="$(printf '%s' "$PROJECT_ROOT" | sha256sum | cut -c1-12)"
+# Use shasum on macOS, sha256sum on Linux
+if command -v sha256sum &>/dev/null; then
+  PROJECT_HASH="$(printf '%s' "$PROJECT_ROOT" | sha256sum | cut -c1-12)"
+elif command -v shasum &>/dev/null; then
+  PROJECT_HASH="$(printf '%s' "$PROJECT_ROOT" | shasum -a 256 | cut -c1-12)"
+else
+  # Fallback: use project root basename if no hashing available
+  PROJECT_HASH="$(basename "$PROJECT_ROOT" | tr -cd 'a-zA-Z0-9' | cut -c1-12)"
+fi
 PROJECT_NAME="$(basename "${PROJECT_ROOT%.git}")"
 PROJECT_DIR="${INSTINCTS_DIR}/${PROJECT_HASH}"
 OBS_FILE="${PROJECT_DIR}/observations.jsonl"

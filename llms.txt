@@ -28,6 +28,16 @@ npx continuous-improvement install
 - **Instincts** — YAML-based behavioral rules with confidence scoring (0.0-0.9)
 - **Auto-leveling** — CAPTURE → ANALYZE → SUGGEST → AUTO-APPLY (no config needed)
 - **Project-scoped** — instincts are per-project, promoted to global when seen in 2+ projects
+- **Planning-With-Files** — opt-in project-root memory files: `task_plan.md`, `findings.md`, `progress.md`
+
+## Optional Planning Workflow
+
+When a task needs persistent file-based planning, use the `planning-with-files` workflow to create:
+- `task_plan.md` — phases, status, decisions, errors
+- `findings.md` — research notes and sources
+- `progress.md` — session log and verification notes
+
+This workflow is explicit and opt-in. Files are created in the git root when available, otherwise the current working directory.
 
 ## Works With
 

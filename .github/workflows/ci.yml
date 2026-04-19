@@ -21,15 +21,21 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build generated artifacts
+        run: npm run build
+
       - name: Run tests
         run: npm test
 
-      - name: Verify zero dependencies
+      - name: Verify zero runtime dependencies
         run: |
-          if [ -f node_modules/.package-lock.json ]; then
-            echo "ERROR: node_modules should not exist — this package has zero dependencies"
-            exit 1
-          fi
+          node -e "const pkg = require('./package.json'); const runtime = ['dependencies','optionalDependencies','bundleDependencies'].flatMap((key) => Object.keys(pkg[key] || {})); if (runtime.length) { console.error('ERROR: runtime dependencies must stay empty:', runtime.join(', ')); process.exit(1); }"
+
+      - name: Verify generated artifacts are committed
+        run: git diff --exit-code -- bin test
 
       - name: Verify SKILL.md contains all 7 laws
         run: |
@@ -54,6 +60,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build generated artifacts
+        run: npm run build
 
       - name: Verify transcript linter works
         run: |

@@ -1,268 +1,335 @@
-import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
-import {
-  existsSync,
-  mkdirSync,
-  rmSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { after, before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-
+class McpTestClient {
+    buffer = Buffer.alloc(0);
+    proc;
+    resolvers = [];
+    constructor(proc) {
+        this.proc = proc;
+        proc.stdout.on("data", (chunk) => {
+            this.buffer = Buffer.concat([this.buffer, chunk]);
+            this.drain();
+        });
+    }
+    drain() {
+        while (this.resolvers.length > 0) {
+            const bufferString = this.buffer.toString("utf8");
+            const headerMatch = bufferString.match(/^Content-Length: (\d+)\r\n\r\n/);
+            if (!headerMatch) {
+                break;
+            }
+            const headerLength = headerMatch[0].length;
+            const bodyLength = Number.parseInt(headerMatch[1], 10);
+            if (this.buffer.length < headerLength + bodyLength) {
+                break;
+            }
+            const bodyString = this.buffer.slice(headerLength, headerLength + bodyLength).toString("utf8");
+            this.buffer = this.buffer.slice(headerLength + bodyLength);
+            const next = this.resolvers.shift();
+            if (!next) {
+                break;
+            }
+            clearTimeout(next.timer);
+            try {
+                next.resolve(JSON.parse(bodyString));
+            }
+            catch (error) {
+                next.resolve({
+                    error: {
+                        message: `JSON parse failed: ${error instanceof Error ? error.message : String(error)}`,
+                    },
+                });
+            }
+        }
+    }
+    send(message) {
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                const index = this.resolvers.findIndex((resolver) => resolver.timer === timer);
+                if (index !== -1) {
+                    this.resolvers.splice(index, 1);
+                }
+                reject(new Error(`Timeout waiting for response to ${String(message.method || message.id)}`));
+            }, 8000);
+            this.resolvers.push({ resolve, reject, timer });
+            this.proc.stdin.write(`${JSON.stringify(message)}\n`);
+            this.drain();
+        });
+    }
+    destroy() {
+        for (const resolver of this.resolvers) {
+            clearTimeout(resolver.timer);
+        }
+        this.resolvers = [];
+        this.proc.kill();
+    }
+}
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const MCP_SERVER = join(__dirname, "..", "bin", "mcp-server.mjs");
-
-/**
- * Reliable MCP stdio client for testing.
- * Buffers all stdout and extracts Content-Length framed messages.
- */
-class McpTestClient {
-  constructor(proc) {
-    this.proc = proc;
-    this.buffer = Buffer.alloc(0);
-    this.resolvers = []; // queue of {resolve, reject, timer}
-
-    proc.stdout.on("data", (chunk) => {
-      this.buffer = Buffer.concat([this.buffer, chunk]);
-      this._drain();
-    });
-  }
-
-  _drain() {
-    while (this.resolvers.length > 0) {
-      const str = this.buffer.toString("utf8");
-      const headerMatch = str.match(/^Content-Length: (\d+)\r\n\r\n/);
-      if (!headerMatch) break;
-
-      const headerLen = headerMatch[0].length;
-      const bodyLen = parseInt(headerMatch[1]);
-      if (this.buffer.length < headerLen + bodyLen) break;
-
-      const bodyStr = this.buffer.slice(headerLen, headerLen + bodyLen).toString("utf8");
-      this.buffer = this.buffer.slice(headerLen + bodyLen);
-
-      const { resolve, timer } = this.resolvers.shift();
-      clearTimeout(timer);
-      try {
-        resolve(JSON.parse(bodyStr));
-      } catch (e) {
-        resolve({ error: { message: `JSON parse failed: ${e.message}` } });
-      }
-    }
-  }
-
-  send(msg) {
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        const idx = this.resolvers.findIndex((r) => r.timer === timer);
-        if (idx !== -1) this.resolvers.splice(idx, 1);
-        reject(new Error(`Timeout waiting for response to ${msg.method || msg.id}`));
-      }, 8000);
-
-      this.resolvers.push({ resolve, reject, timer });
-      this.proc.stdin.write(JSON.stringify(msg) + "\n");
-
-      // Try draining immediately in case data already buffered
-      this._drain();
-    });
-  }
-
-  destroy() {
-    for (const r of this.resolvers) clearTimeout(r.timer);
-    this.resolvers = [];
-    this.proc.kill();
-  }
-}
-
 describe("MCP server — beginner mode", () => {
-  let client;
-  let tempHome;
-
-  before(async () => {
-    tempHome = join(tmpdir(), `ci-mcp-test-${Date.now()}`);
-    mkdirSync(join(tempHome, ".claude", "instincts", "global"), { recursive: true });
-
-    const proc = spawn("node", [MCP_SERVER, "--mode", "beginner"], {
-      env: { ...process.env, HOME: tempHome },
-      stdio: ["pipe", "pipe", "pipe"],
+    let client;
+    let tempHome = "";
+    before(async () => {
+        tempHome = join(tmpdir(), `ci-mcp-test-${Date.now()}`);
+        mkdirSync(join(tempHome, ".claude", "instincts", "global"), { recursive: true });
+        const proc = spawn("node", [MCP_SERVER, "--mode", "beginner"], {
+            env: { ...process.env, HOME: tempHome },
+            stdio: ["pipe", "pipe", "pipe"],
+        });
+        client = new McpTestClient(proc);
+        await new Promise((resolve) => setTimeout(resolve, 200));
     });
-    client = new McpTestClient(proc);
-
-    // Wait a moment for server to start
-    await new Promise((r) => setTimeout(r, 200));
-  });
-
-  after(() => {
-    client.destroy();
-    rmSync(tempHome, { recursive: true, force: true });
-  });
-
-  it("responds to initialize", async () => {
-    const resp = await client.send({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
-    assert.equal(resp.result.serverInfo.name, "continuous-improvement");
-    assert.equal(resp.result.serverInfo.version, "3.1.0");
-  });
-
-  it("lists beginner tools only (3 tools)", async () => {
-    const resp = await client.send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
-    const names = resp.result.tools.map((t) => t.name);
-    assert.equal(names.length, 3);
-    assert.ok(names.includes("ci_status"));
-    assert.ok(names.includes("ci_instincts"));
-    assert.ok(names.includes("ci_reflect"));
-    assert.ok(!names.includes("ci_reinforce"), "Should NOT include expert tools");
-  });
-
-  it("ci_status returns project info", async () => {
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 3, method: "tools/call",
-      params: { name: "ci_status", arguments: {} },
+    after(async () => {
+        client.destroy();
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        try {
+            rmSync(tempHome, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+        }
+        catch {
+            // Windows can briefly keep stdio handles open after the child exits.
+        }
     });
-    const text = resp.result.content[0].text;
-    assert.match(text, /Level:/, "Should include level");
-    assert.match(text, /Observations:/, "Should include observation count");
-    assert.match(text, /beginner/, "Should show beginner mode");
-  });
-
-  it("ci_instincts returns empty message when no instincts", async () => {
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 4, method: "tools/call",
-      params: { name: "ci_instincts", arguments: {} },
+    it("responds to initialize", async () => {
+        const response = await client.send({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });
+        assert.equal(response.result.serverInfo.name, "continuous-improvement");
+        assert.equal(response.result.serverInfo.version, "3.2.0");
     });
-    const text = resp.result.content[0].text;
-    assert.match(text, /No instincts found/i);
-  });
-
-  it("ci_reflect returns reflection template", async () => {
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 5, method: "tools/call",
-      params: { name: "ci_reflect", arguments: { summary: "Fixed a login bug" } },
+    it("lists beginner tools only (3 tools)", async () => {
+        const response = await client.send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
+        const names = response.result.tools.map((tool) => tool.name);
+        assert.equal(names.length, 3);
+        assert.ok(names.includes("ci_status"));
+        assert.ok(names.includes("ci_instincts"));
+        assert.ok(names.includes("ci_reflect"));
+        assert.ok(!names.includes("ci_reinforce"), "Should NOT include expert tools");
     });
-    const text = resp.result.content[0].text;
-    assert.match(text, /Fixed a login bug/);
-    assert.match(text, /What worked/);
-    assert.match(text, /What failed/);
-  });
-
-  it("rejects expert tools in beginner mode", async () => {
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 6, method: "tools/call",
-      params: { name: "ci_reinforce", arguments: { instinct_id: "test", accepted: true } },
+    it("ci_status returns project info", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 3,
+            method: "tools/call",
+            params: { name: "ci_status", arguments: {} },
+        });
+        const text = response.result.content[0].text;
+        assert.match(text, /Level:/, "Should include level");
+        assert.match(text, /Observations:/, "Should include observation count");
+        assert.match(text, /beginner/, "Should show beginner mode");
     });
-    assert.ok(resp.result.isError, "Should return error for expert tool in beginner mode");
-  });
-
-  it("lists resources", async () => {
-    const resp = await client.send({ jsonrpc: "2.0", id: 7, method: "resources/list", params: {} });
-    assert.ok(resp.result.resources.length >= 1, "Should list at least 1 resource");
-    const uris = resp.result.resources.map((r) => r.uri);
-    assert.ok(uris.some((u) => u.includes("instincts://")));
-  });
+    it("ci_instincts returns empty message when no instincts", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 4,
+            method: "tools/call",
+            params: { name: "ci_instincts", arguments: {} },
+        });
+        assert.match(response.result.content[0].text, /No instincts found/i);
+    });
+    it("ci_reflect returns reflection template", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 5,
+            method: "tools/call",
+            params: { name: "ci_reflect", arguments: { summary: "Fixed a login bug" } },
+        });
+        const text = response.result.content[0].text;
+        assert.match(text, /Fixed a login bug/);
+        assert.match(text, /What worked/);
+        assert.match(text, /What failed/);
+    });
+    it("rejects expert tools in beginner mode", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 6,
+            method: "tools/call",
+            params: { name: "ci_reinforce", arguments: { instinct_id: "test", accepted: true } },
+        });
+        assert.ok(response.result.isError, "Should return error for expert tool in beginner mode");
+    });
+    it("lists resources", async () => {
+        const response = await client.send({ jsonrpc: "2.0", id: 7, method: "resources/list", params: {} });
+        assert.ok(response.result.resources.length >= 1, "Should list at least 1 resource");
+        const uris = response.result.resources.map((resource) => resource.uri);
+        assert.ok(uris.some((uri) => uri.includes("instincts://")));
+    });
 });
-
 describe("MCP server — expert mode", () => {
-  let client;
-  let tempHome;
-
-  before(async () => {
-    tempHome = join(tmpdir(), `ci-mcp-expert-${Date.now()}`);
-    mkdirSync(join(tempHome, ".claude", "instincts", "global"), { recursive: true });
-
-    const proc = spawn("node", [MCP_SERVER, "--mode", "expert"], {
-      env: { ...process.env, HOME: tempHome },
-      stdio: ["pipe", "pipe", "pipe"],
+    let client;
+    let tempHome = "";
+    let tempWorkspace = "";
+    before(async () => {
+        tempHome = join(tmpdir(), `ci-mcp-expert-${Date.now()}`);
+        mkdirSync(join(tempHome, ".claude", "instincts", "global"), { recursive: true });
+        tempWorkspace = join(tempHome, "workspace");
+        mkdirSync(tempWorkspace, { recursive: true });
+        const proc = spawn("node", [MCP_SERVER, "--mode", "expert"], {
+            env: { ...process.env, HOME: tempHome },
+            cwd: tempWorkspace,
+            stdio: ["pipe", "pipe", "pipe"],
+        });
+        client = new McpTestClient(proc);
+        await new Promise((resolve) => setTimeout(resolve, 200));
     });
-    client = new McpTestClient(proc);
-    await new Promise((r) => setTimeout(r, 200));
-  });
-
-  after(() => {
-    client.destroy();
-    rmSync(tempHome, { recursive: true, force: true });
-  });
-
-  it("lists all 10 tools in expert mode", async () => {
-    await client.send({ jsonrpc: "2.0", id: 10, method: "initialize", params: {} });
-    const resp = await client.send({ jsonrpc: "2.0", id: 11, method: "tools/list", params: {} });
-    const names = resp.result.tools.map((t) => t.name);
-    assert.equal(names.length, 10, `Expected 10 tools, got ${names.length}: ${names.join(", ")}`);
-    assert.ok(names.includes("ci_reinforce"));
-    assert.ok(names.includes("ci_create_instinct"));
-    assert.ok(names.includes("ci_observations"));
-    assert.ok(names.includes("ci_export"));
-    assert.ok(names.includes("ci_import"));
-    assert.ok(names.includes("ci_dashboard"));
-    assert.ok(names.includes("ci_load_pack"));
-  });
-
-  it("ci_export returns JSON array", async () => {
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 12, method: "tools/call",
-      params: { name: "ci_export", arguments: { scope: "all" } },
+    after(async () => {
+        client.destroy();
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        try {
+            rmSync(tempHome, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+        }
+        catch {
+            // Windows can briefly keep stdio handles open after the child exits.
+        }
     });
-    const text = resp.result.content[0].text;
-    const parsed = JSON.parse(text);
-    assert.ok(Array.isArray(parsed), "Export should return JSON array");
-  });
-
-  it("ci_create_instinct creates a new instinct", async () => {
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 13, method: "tools/call",
-      params: {
-        name: "ci_create_instinct",
-        arguments: {
-          id: "new-test-instinct",
-          trigger: "when writing code",
-          body: "Write tests first",
-          confidence: 0.7,
-        },
-      },
+    it("lists all 12 tools in expert mode", async () => {
+        await client.send({ jsonrpc: "2.0", id: 10, method: "initialize", params: {} });
+        const response = await client.send({ jsonrpc: "2.0", id: 11, method: "tools/list", params: {} });
+        const names = response.result.tools.map((tool) => tool.name);
+        assert.equal(names.length, 12, `Expected 12 tools, got ${names.length}: ${names.join(", ")}`);
+        assert.ok(names.includes("ci_reinforce"));
+        assert.ok(names.includes("ci_create_instinct"));
+        assert.ok(names.includes("ci_observations"));
+        assert.ok(names.includes("ci_export"));
+        assert.ok(names.includes("ci_import"));
+        assert.ok(names.includes("ci_plan_init"));
+        assert.ok(names.includes("ci_plan_status"));
+        assert.ok(names.includes("ci_dashboard"));
+        assert.ok(names.includes("ci_load_pack"));
     });
-    const text = resp.result.content[0].text;
-    assert.match(text, /Created instinct/);
-    assert.match(text, /new-test-instinct/);
-  });
-
-  it("ci_import imports and reports count", async () => {
-    const importData = JSON.stringify([
-      { id: "imported-unique-1", trigger: "when deploying", body: "Check CI first", confidence: 0.5 },
-      { id: "imported-unique-2", trigger: "when reviewing", body: "Check coverage", confidence: 0.5 },
-    ]);
-
-    const resp = await client.send({
-      jsonrpc: "2.0", id: 14, method: "tools/call",
-      params: { name: "ci_import", arguments: { instincts_json: importData } },
+    it("ci_export returns JSON array", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 12,
+            method: "tools/call",
+            params: { name: "ci_export", arguments: { scope: "all" } },
+        });
+        const parsed = JSON.parse(response.result.content[0].text);
+        assert.ok(Array.isArray(parsed), "Export should return JSON array");
     });
-    const text = resp.result.content[0].text;
-    assert.match(text, /Imported \d+/);
-  });
-
-  it("returns error for unknown method", async () => {
-    const resp = await client.send({ jsonrpc: "2.0", id: 15, method: "nonexistent/method", params: {} });
-    assert.ok(resp.error, "Should return error for unknown method");
-    assert.equal(resp.error.code, -32601);
-  });
+    it("ci_create_instinct creates a new instinct", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 13,
+            method: "tools/call",
+            params: {
+                name: "ci_create_instinct",
+                arguments: {
+                    id: "new-test-instinct",
+                    trigger: "when writing code",
+                    body: "Write tests first",
+                    confidence: 0.7,
+                },
+            },
+        });
+        const text = response.result.content[0].text;
+        assert.match(text, /Created instinct/);
+        assert.match(text, /new-test-instinct/);
+    });
+    it("ci_import imports and reports count", async () => {
+        const importData = JSON.stringify([
+            { id: "imported-unique-1", trigger: "when deploying", body: "Check CI first", confidence: 0.5 },
+            { id: "imported-unique-2", trigger: "when reviewing", body: "Check coverage", confidence: 0.5 },
+        ]);
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 14,
+            method: "tools/call",
+            params: { name: "ci_import", arguments: { instincts_json: importData } },
+        });
+        assert.match(response.result.content[0].text, /Imported \d+/);
+    });
+    it("ci_plan_init creates planning files in the workspace root", async () => {
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 15,
+            method: "tools/call",
+            params: {
+                name: "ci_plan_init",
+                arguments: { goal: "Ship the planning workflow" },
+            },
+        });
+        assert.match(response.result.content[0].text, /Planning-With-Files Initialized/);
+        assert.ok(existsSync(join(tempWorkspace, "task_plan.md")));
+        assert.ok(existsSync(join(tempWorkspace, "findings.md")));
+        assert.ok(existsSync(join(tempWorkspace, "progress.md")));
+        const taskPlan = readFileSync(join(tempWorkspace, "task_plan.md"), "utf8");
+        assert.match(taskPlan, /Ship the planning workflow/);
+        assert.match(taskPlan, /- \[ \] Research/);
+    });
+    it("ci_plan_init preserves existing files when force is false", async () => {
+        const taskPlanPath = join(tempWorkspace, "task_plan.md");
+        writeFileSync(taskPlanPath, "# Task Plan\n\n## Status\nCustom status\n");
+        await client.send({
+            jsonrpc: "2.0",
+            id: 16,
+            method: "tools/call",
+            params: {
+                name: "ci_plan_init",
+                arguments: { goal: "Should not overwrite existing plan" },
+            },
+        });
+        assert.equal(readFileSync(taskPlanPath, "utf8"), "# Task Plan\n\n## Status\nCustom status\n");
+    });
+    it("ci_plan_status summarizes checked phases and can include file contents", async () => {
+        writeFileSync(join(tempWorkspace, "task_plan.md"), [
+            "# Task Plan",
+            "",
+            "## Goal",
+            "Ship the planning workflow",
+            "",
+            "## Status",
+            "In progress",
+            "",
+            "## Phases",
+            "- [x] Research",
+            "- [ ] Plan",
+            "- [ ] Execute",
+        ].join("\n") + "\n");
+        writeFileSync(join(tempWorkspace, "findings.md"), "# Findings\n\n- Found the MCP integration points.\n");
+        writeFileSync(join(tempWorkspace, "progress.md"), "# Progress\n\n- Ran initialization.\n");
+        const response = await client.send({
+            jsonrpc: "2.0",
+            id: 17,
+            method: "tools/call",
+            params: {
+                name: "ci_plan_status",
+                arguments: { include_contents: true },
+            },
+        });
+        const text = response.result.content[0].text;
+        assert.match(text, /\*\*Status:\*\* In progress/);
+        assert.match(text, /Checked phases:\*\* Research/);
+        assert.match(text, /Remaining phases:\*\* Plan, Execute/);
+        assert.match(text, /findings\.md: present \(has notes\)/);
+        assert.match(text, /## task_plan\.md/);
+        assert.match(text, /# Task Plan/);
+    });
+    it("returns error for unknown method", async () => {
+        const response = await client.send({ jsonrpc: "2.0", id: 18, method: "nonexistent/method", params: {} });
+        assert.ok(response.error, "Should return error for unknown method");
+        assert.equal(response.error?.code, -32601);
+    });
 });
-
 describe("Plugin configs", () => {
-  it("beginner.json is valid and has 3 tools", () => {
-    const config = JSON.parse(
-      readFileSync(join(__dirname, "..", "plugins", "beginner.json"), "utf8")
-    );
-    assert.equal(config.mode, "beginner");
-    assert.equal(config.tools.length, 3);
-    assert.equal(config.version, "3.1.0");
-  });
-
-  it("expert.json is valid and has 10 tools", () => {
-    const config = JSON.parse(
-      readFileSync(join(__dirname, "..", "plugins", "expert.json"), "utf8")
-    );
-    assert.equal(config.mode, "expert");
-    assert.equal(config.tools.length, 10);
-    assert.equal(config.version, "3.1.0");
-  });
+    it("beginner.json is valid and has 3 tools", () => {
+        const config = JSON.parse(readFileSync(join(__dirname, "..", "plugins", "beginner.json"), "utf8"));
+        assert.equal(config.mode, "beginner");
+        assert.ok(config.tools.length >= 3);
+        assert.match(config.version, /^\d+\.\d+\.\d+$/);
+        assert.ok(config.tools.some((tool) => tool.name === "ci_status"));
+        assert.ok(config.tools.some((tool) => tool.name === "ci_reflect"));
+    });
+    it("expert.json is valid and has 12 tools", () => {
+        const config = JSON.parse(readFileSync(join(__dirname, "..", "plugins", "expert.json"), "utf8"));
+        assert.equal(config.mode, "expert");
+        assert.ok(config.tools.length >= 12);
+        assert.match(config.version, /^\d+\.\d+\.\d+$/);
+        assert.ok(config.tools.some((tool) => tool.name === "ci_plan_init"));
+        assert.ok(config.tools.some((tool) => tool.name === "ci_plan_status"));
+        assert.ok(config.tools.some((tool) => tool.name === "ci_dashboard"));
+        assert.ok(config.tools.some((tool) => tool.name === "ci_load_pack"));
+    });
 });

@@ -78,9 +78,9 @@ if [[ "$EVENT_TYPE" == "SessionStart" || "$EVENT_TYPE" == "unknown" ]]; then
           [[ -f "$f" ]] || continue
           conf="$(grep '^confidence:' "$f" 2>/dev/null | head -1 | sed 's/confidence: *//')"
           if [[ -n "$conf" ]]; then
-            # Compare as integer (multiply by 100)
-            int_conf="$(printf '%.0f' "$(echo "$conf * 100" | bc 2>/dev/null || echo 0)")"
-            if (( int_conf >= 70 )); then
+            # Compare as integer (multiply by 100) using awk for portability
+            int_conf="$(printf '%s' "$conf" | awk '{printf "%.0f", $1 * 100}')"
+            if [[ -n "$int_conf" ]] && (( int_conf >= 70 )); then
               LEVEL="AUTO-APPLY"
               break 2
             elif (( int_conf >= 50 )); then

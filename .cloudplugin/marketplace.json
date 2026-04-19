@@ -1,6 +1,6 @@
 {
   "name": "continuous-improvement",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "The 7 Laws of AI Agent Discipline — auto-leveling instinct learning with MCP server, GitHub Action transcript linter, and starter instinct packs",
   "author": "naimkatiman",
   "license": "MIT",
@@ -15,7 +15,46 @@
         "follow the improvement loop",
         "research plan execute verify reflect",
         "structured improvement",
-        "agent discipline"
+        "agent discipline",
+        "planning with files",
+        "persistent file-based planning"
+      ]
+    },
+    {
+      "name": "workspace-surface-audit",
+      "description": "Audit repo, MCP servers, plugins, and env surfaces to recommend ECC-native skills and workflows",
+      "file": "skills/workspace-surface-audit.md",
+      "triggers": [
+        "audit my workspace",
+        "what can this workspace do",
+        "recommend automations",
+        "what am i missing",
+        "set up claude code",
+        "workspace capabilities"
+      ]
+    },
+    {
+      "name": "ralph",
+      "description": "Autonomous AI agent loop that runs iteratively until all PRD stories are complete",
+      "file": "skills/ralph.md",
+      "triggers": [
+        "run ralph",
+        "autonomous agent loop",
+        "implement prd iteratively",
+        "convert prd to executable",
+        "ralph workflow"
+      ]
+    },
+    {
+      "name": "superpowers",
+      "description": "Mandatory agent workflows — brainstorming, TDD, code review, git worktrees, structured development",
+      "file": "skills/superpowers.md",
+      "triggers": [
+        "activate superpowers",
+        "mandatory workflows",
+        "brainstorming workflow",
+        "test driven development",
+        "structured development"
       ]
     }
   ],
@@ -25,15 +64,31 @@
       "description": "Reflect, analyze, and show instinct status"
     },
     {
+      "name": "planning-with-files",
+      "description": "Create and maintain task_plan.md, findings.md, and progress.md in the project root"
+    },
+    {
       "name": "discipline",
       "description": "Quick reference card for the 7 Laws"
     },
     {
       "name": "dashboard",
       "description": "Visual instinct health dashboard"
+    },
+    {
+      "name": "workspace-surface-audit",
+      "description": "Audit workspace capabilities and recommend ECC-native skills"
+    },
+    {
+      "name": "ralph",
+      "description": "Convert PRD to executable JSON and run autonomous agent loop"
+    },
+    {
+      "name": "superpowers",
+      "description": "Activate mandatory workflows: brainstorming, TDD, code review, git worktrees"
     }
   ],
   "instinct_packs": ["react", "python", "go"],
-  "tags": ["productivity", "agent", "discipline", "workflow", "self-improvement", "mcp", "github-action"],
+  "tags": ["productivity", "agent", "discipline", "workflow", "self-improvement", "planning", "mcp", "github-action", "workspace-audit", "superpowers", "ralph", "tdd", "autonomous"],
   "compatibleWith": ["claude", "claude-code", "codex", "opencode", "openclaw", "cursor", "gemini-cli"]
 }

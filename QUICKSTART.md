@@ -31,6 +31,14 @@ Use the continuous-improvement framework to refactor the payment module to use t
 
 Your agent will research, plan, execute one thing at a time, verify, and reflect.
 
+For long tasks that need persistent notes on disk, run:
+
+```
+/planning-with-files
+```
+
+That creates `task_plan.md`, `findings.md`, and `progress.md` in the project root only when you explicitly ask for it.
+
 ---
 
 ## Step 3: Check Learning

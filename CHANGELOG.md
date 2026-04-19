@@ -4,6 +4,22 @@ All notable changes to this skill are documented here.
 
 ---
 
+## [3.2.0] — 2026-04-19
+
+### Added
+- **Planning-With-Files workflow** — opt-in persistent project-root planning via `task_plan.md`, `findings.md`, and `progress.md`
+- **`/planning-with-files` command** — initialize, inspect, checkpoint, and recover file-based plans in Claude Code
+- **Planning templates** — packaged repo-owned templates under `templates/planning-with-files/`
+- **Expert MCP planning tools** — `ci_plan_init` and `ci_plan_status` for initializing and summarizing planning files programmatically
+
+### Changed
+- **Expert plugin surface** — expert mode now exposes 12 tools instead of 10
+- **Installer** — now installs `/planning-with-files` alongside the existing Claude commands
+- **Docs and metadata** — updated README, quickstart, skill docs, marketplace metadata, and translations to document the opt-in planning workflow
+- **Version bump** to 3.2.0
+
+---
+
 ## [3.0.0] — 2026-04-06
 
 ### Added

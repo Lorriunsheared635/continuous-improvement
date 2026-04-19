@@ -45,7 +45,8 @@ Add translations to `docs/` following the pattern `README.<lang-code>.md`.
 
 ## Code Style
 
-- Zero external dependencies (Node.js built-ins only)
+- Zero runtime dependencies (Node.js built-ins only at runtime)
+- TypeScript source lives in `src/` and compiled `.mjs` artifacts are committed in `bin/` and `test/`
 - Tests use `node:test` and `node:assert/strict`
 - Hooks must complete in <200ms
 - MCP server must work without any npm packages
@@ -53,16 +54,17 @@ Add translations to `docs/` following the pattern `README.<lang-code>.md`.
 ## Architecture
 
 ```
-SKILL.md          → The rules (any LLM can follow these)
-hooks/observe.sh  → Captures tool calls to JSONL (<50ms)
-hooks/session.sh  → Session start/end events (expert mode)
-bin/install.mjs   → CLI installer (multi-target)
-bin/mcp-server.mjs → MCP protocol server (zero deps)
+SKILL.md            → The rules (any LLM can follow these)
+hooks/observe.sh    → Captures tool calls to JSONL (<50ms)
+hooks/session.sh    → Session start/end events (expert mode)
+src/bin/*.mts       → TypeScript source of truth for CLI tools and tests
+bin/*.mjs           → Committed runtime artifacts used by npm/action entrypoints
 ```
 
 ## Testing
 
 ```bash
+npm run build               # Regenerate bin/*.mjs and test/*.test.mjs
 npm test                    # Run all tests
 node --test test/hook.test.mjs  # Run specific test file
 ```

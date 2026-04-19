@@ -1,6 +1,6 @@
 {
   "name": "continuous-improvement",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "The 7 Laws of AI Agent Discipline — stop your agent from skipping steps, guessing, and declaring 'done' without verifying. Auto-leveling instinct learning with MCP server, GitHub Action transcript linter, and starter instinct packs for Claude Code, Cursor, Codex, Gemini CLI.",
   "keywords": [
     "claude-code",
@@ -13,6 +13,8 @@
     "ai-discipline",
     "workflow",
     "productivity",
+    "self-improvement",
+    "planning",
     "mulahazah",
     "instinct",
     "learning",
@@ -26,7 +28,13 @@
     "agent-discipline",
     "developer-tools",
     "anthropic",
-    "llm"
+    "llm",
+    "workspace-audit",
+    "superpowers",
+    "ralph",
+    "autonomous-agent",
+    "test-driven-development",
+    "tdd"
   ],
   "author": "naimkatiman",
   "license": "MIT",
@@ -40,11 +48,16 @@
   },
   "bin": {
     "continuous-improvement": "bin/install.mjs",
-    "ci-lint-transcript": "bin/lint-transcript.mjs"
+    "ci-lint-transcript": "bin/lint-transcript.mjs",
+    "ci": "bin/unified-cli.mjs"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs",
-    "lint": "node bin/lint-transcript.mjs --help"
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "node -e \"const fs=require('node:fs'); for (const dir of ['bin','test']) { if (!fs.existsSync(dir)) continue; for (const file of fs.readdirSync(dir)) { if (file.endsWith('.mjs')) fs.rmSync(dir + '/' + file, { force: true }); } }\"",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "lint": "node bin/lint-transcript.mjs --help",
+    "verify:generated": "npm run build && git diff --exit-code -- bin test"
   },
   "files": [
     "SKILL.md",
@@ -56,8 +69,14 @@
     "bin/",
     "hooks/",
     "commands/",
+    "skills/",
+    "templates/",
     "plugins/",
     "instinct-packs/"
   ],
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
+  }
 }
