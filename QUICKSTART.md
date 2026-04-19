@@ -12,6 +12,18 @@ npx continuous-improvement install
 
 This auto-detects your setup. For Claude Code, it installs the skill, hooks, and `/continuous-improvement` command.
 
+On Windows, run the same command from PowerShell. Install Git Bash or WSL first so the observation hooks can execute.
+
+### Verify the install
+
+Open Claude Code and run:
+
+```
+/discipline
+```
+
+You should see the 7 Laws quick-reference card. If the command is not recognized, the skill did not land — re-run the install step.
+
 ---
 
 ## Step 2: Use It

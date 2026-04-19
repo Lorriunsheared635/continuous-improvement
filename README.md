@@ -31,6 +31,25 @@
   <a href="docs/README.ja.md">日本語</a>
 </p>
 
+<p align="center">
+  <b>New here?</b> → <a href="QUICKSTART.md">QUICKSTART.md</a> gets you working in 2 minutes.
+</p>
+
+---
+
+## Contents
+
+- [The Problem](#the-problem)
+- [Install](#install)
+- [The 7 Laws](#the-7-laws-of-ai-agent-discipline)
+- [Mulahazah: Auto-Leveling Learning](#mulahazah-auto-leveling-learning)
+- [GitHub Action](#github-action-agent-transcript-linter)
+- [Plugin Architecture](#plugin-architecture)
+- [Examples](#real-world-examples)
+- [Works With](#works-with)
+- [Uninstall](#uninstall)
+- [Contributing](#contributing)
+
 ---
 
 ## The Problem
@@ -114,10 +133,16 @@ Agent: **[Law 1: Research]** Searching for existing rate limiting...
 npx continuous-improvement install
 ```
 
+On Windows PowerShell the same command works; ensure Git Bash or WSL is installed first so the observation hooks can run.
+
 That's it. For Claude Code, this installs:
 - Observation hooks (captures every tool call, <50ms, jq optional)
 - `/continuous-improvement`, `/planning-with-files`, `/discipline`, and `/dashboard` commands
 - Auto-leveling instinct system
+
+After install, confirm it worked by running `/discipline` or `/dashboard` inside Claude Code. Both are no-ops if the skill did not land.
+
+> **CLI aliases.** The npm package exposes three bins: `continuous-improvement` (main CLI), `ci` (shorthand for the same CLI), and `ci-lint-transcript` (GitHub Action entrypoint). Anywhere you see `npx continuous-improvement ...` you can substitute `npx ci ...`.
 
 ### Expert — full power with MCP server
 
@@ -313,7 +338,8 @@ Paste SKILL.md into your system prompt. Your agent follows the 7 Laws. No tools,
 
 **Expert** adds the MCP server for programmatic access, manual instinct management, import/export for team sharing, visual dashboard, and instinct packs.
 
-### MCP Tools Reference
+<details>
+<summary><b>MCP Tools Reference</b> (12 tools — click to expand)</summary>
 
 | Tool | Description |
 |------|-------------|
@@ -329,6 +355,8 @@ Paste SKILL.md into your system prompt. Your agent follows the 7 Laws. No tools,
 | `ci_plan_status` | Summarize `task_plan.md`, `findings.md`, and `progress.md` (expert) |
 | `ci_dashboard` | Visual dashboard with confidence distribution (expert) |
 | `ci_load_pack` | Load starter instinct packs (expert) |
+
+</details>
 
 ### Inspired By Planning-With-Files
 
@@ -352,52 +380,18 @@ Each example shows the same task done with and without the 7 laws, highlighting 
 
 ## Files
 
-```
-continuous-improvement/
-├── SKILL.md                           # The 7 Laws + instinct behavior
-├── src/
-│   ├── bin/
-│   │   ├── install.mts                # TypeScript source for the installer
-│   │   ├── mcp-server.mts             # TypeScript source for the MCP server
-│   │   └── lint-transcript.mts        # TypeScript source for the transcript linter
-│   └── test/
-│       └── *.test.mts                 # TypeScript source for the Node test suite
-├── bin/
-│   ├── install.mjs                    # Committed runtime artifact for the installer
-│   ├── mcp-server.mjs                 # Committed runtime artifact for the MCP server
-│   └── lint-transcript.mjs            # Committed runtime artifact for the transcript linter
-├── hooks/
-│   ├── observe.sh                     # Observation hook (pure bash, <50ms)
-│   └── session.sh                     # Session start/end hook (expert mode)
-├── plugins/
-│   ├── beginner.json                  # Plugin manifest: 3 tools
-│   └── expert.json                    # Plugin manifest: 12 tools
-├── commands/
-│   ├── continuous-improvement.md     # /continuous-improvement command
-│   ├── planning-with-files.md        # /planning-with-files command
-│   ├── discipline.md                 # /discipline quick reference
-│   └── dashboard.md                  # /dashboard visual display
-├── templates/
-│   └── planning-with-files/          # Project-root planning file templates
-├── instinct-packs/
-│   ├── react.json                     # React/Next.js starter instincts
-│   ├── python.json                   # Python starter instincts
-│   └── go.json                       # Go starter instincts
-├── test/                              # Node test suite (node --test)
-├── examples/                          # Real-world before/after scenarios
-├── docs/                              # Translations (zh-CN, ja)
-├── .github/
-│   ├── workflows/ci.yml             # CI pipeline (Node 18/20/22)
-│   └── ISSUE_TEMPLATE/              # Bug report + feature request templates
-├── action.yml                        # GitHub Action definition
-├── llms.txt                          # LLM-friendly project description
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-├── SECURITY.md
-├── QUICKSTART.md
-├── CHANGELOG.md
-└── package.json
-```
+Top-level layout a beginner needs to know:
+
+- `SKILL.md` — the 7 Laws + instinct behavior (paste into any LLM)
+- `hooks/` — bash observation hooks for Claude Code
+- `commands/` — slash commands (`/continuous-improvement`, `/planning-with-files`, `/discipline`, `/dashboard`)
+- `plugins/` — `beginner.json` and `expert.json` manifests
+- `instinct-packs/` — React, Python, Go starter packs
+- `examples/` — real before/after walkthroughs
+- `skills/` — bundled companion skills ([README](skills/))
+- `docs/` — translations (zh-CN, ja)
+
+Contributor-facing internals (`src/`, `bin/`, `test/`, build pipeline) are documented in [CONTRIBUTING.md](CONTRIBUTING.md#architecture).
 
 ### What gets installed where
 
