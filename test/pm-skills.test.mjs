@@ -57,6 +57,7 @@ describe("PM-Skills", () => {
         assert.ok(result.kpis);
         assert.ok(result.timestamp);
         assert.ok(result.savedTo);
+        assert.match(JSON.stringify(loops), /Test Product|business/i);
     });
     test("should execute market research skill", async () => {
         const result = await pmSkills.executeSkill("marketResearch", {
@@ -77,6 +78,7 @@ describe("PM-Skills", () => {
         assert.ok(result.risks);
         assert.ok(result.opportunities);
         assert.ok(result.timestamp);
+        assert.match(JSON.stringify(research), /Technology|SMB/i);
     });
     test("should execute GTM strategy skill", async () => {
         const result = await pmSkills.executeSkill("gtmStrategy", {
@@ -99,6 +101,9 @@ describe("PM-Skills", () => {
         assert.ok(result.budget);
         assert.ok(result.kpis);
         assert.ok(result.timestamp);
+        assert.match(JSON.stringify(strategy.positioning), /Test Product/);
+        assert.equal(result.timeline.totalDuration, "12 weeks");
+        assert.equal(result.budget.total, "$50,000");
     });
     test("should execute user personas skill", async () => {
         const result = await pmSkills.executeSkill("userPersonas", {
@@ -118,6 +123,7 @@ describe("PM-Skills", () => {
         assert.ok(result.insights);
         assert.ok(result.recommendations);
         assert.ok(result.timestamp);
+        assert.match(String(personas[0].role), /Manager/i);
     });
     test("should execute competitive analysis skill", async () => {
         const result = await pmSkills.executeSkill("competitiveAnalysis", {
@@ -137,6 +143,7 @@ describe("PM-Skills", () => {
         assert.ok(result.insights);
         assert.ok(result.recommendations);
         assert.ok(result.timestamp);
+        assert.equal((analysis.directCompetitors[0]?.name), "Competitor A");
     });
     test("should execute value proposition skill", async () => {
         const result = await pmSkills.executeSkill("valueProposition", {
@@ -155,6 +162,7 @@ describe("PM-Skills", () => {
         assert.ok(result.insights);
         assert.ok(result.recommendations);
         assert.ok(result.timestamp);
+        assert.match(String(analysis.valueProposition.headline), /Test Product|Efficiency/i);
     });
     test("should execute product roadmap skill", async () => {
         const result = await pmSkills.executeSkill("productRoadmap", {
@@ -176,6 +184,7 @@ describe("PM-Skills", () => {
         assert.ok(result.recommendations);
         assert.ok(result.kpis);
         assert.ok(result.timestamp);
+        assert.match(String(roadmap.vision.statement), /Become market leader/i);
     });
     test("should execute metrics definition skill", async () => {
         const result = await pmSkills.executeSkill("metricsDefinition", {
@@ -195,6 +204,8 @@ describe("PM-Skills", () => {
         assert.ok(result.recommendations);
         assert.ok(result.implementation);
         assert.ok(result.timestamp);
+        const primary = metrics.kpis.primary;
+        assert.ok(primary.some((item) => String(item.metric).includes("monthly_recurring_growth")));
     });
     test("should run comprehensive product analysis", async () => {
         const productInfo = {
@@ -213,6 +224,8 @@ describe("PM-Skills", () => {
         assert.ok(Array.isArray(result.summary.recommendations));
         assert.ok(Array.isArray(result.summary.risks));
         assert.ok(Array.isArray(result.summary.opportunities));
+        assert.ok(result.summary.keyInsights.length <= 12);
+        assert.ok(result.summary.recommendations.length <= 12);
     });
     test("should handle invalid skill names", async () => {
         await assert.rejects(() => pmSkills.executeSkill("invalidSkill", {}), /Unknown skill/);

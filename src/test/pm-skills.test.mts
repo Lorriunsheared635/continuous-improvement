@@ -65,6 +65,7 @@ describe("PM-Skills", () => {
     assert.ok(result.kpis);
     assert.ok(result.timestamp);
     assert.ok(result.savedTo);
+    assert.match(JSON.stringify(loops), /Test Product|business/i);
   });
 
   test("should execute market research skill", async () => {
@@ -87,6 +88,7 @@ describe("PM-Skills", () => {
     assert.ok(result.risks);
     assert.ok(result.opportunities);
     assert.ok(result.timestamp);
+    assert.match(JSON.stringify(research), /Technology|SMB/i);
   });
 
   test("should execute GTM strategy skill", async () => {
@@ -111,6 +113,9 @@ describe("PM-Skills", () => {
     assert.ok(result.budget);
     assert.ok(result.kpis);
     assert.ok(result.timestamp);
+    assert.match(JSON.stringify(strategy.positioning), /Test Product/);
+    assert.equal((result.timeline as { totalDuration: string }).totalDuration, "12 weeks");
+    assert.equal((result.budget as { total: string }).total, "$50,000");
   });
 
   test("should execute user personas skill", async () => {
@@ -132,6 +137,7 @@ describe("PM-Skills", () => {
     assert.ok(result.insights);
     assert.ok(result.recommendations);
     assert.ok(result.timestamp);
+    assert.match(String(personas[0]!.role), /Manager/i);
   });
 
   test("should execute competitive analysis skill", async () => {
@@ -153,6 +159,10 @@ describe("PM-Skills", () => {
     assert.ok(result.insights);
     assert.ok(result.recommendations);
     assert.ok(result.timestamp);
+    assert.equal(
+      ((analysis.directCompetitors as Array<Record<string, unknown>>)[0]?.name),
+      "Competitor A",
+    );
   });
 
   test("should execute value proposition skill", async () => {
@@ -173,6 +183,10 @@ describe("PM-Skills", () => {
     assert.ok(result.insights);
     assert.ok(result.recommendations);
     assert.ok(result.timestamp);
+    assert.match(
+      String((analysis.valueProposition as Record<string, unknown>).headline),
+      /Test Product|Efficiency/i,
+    );
   });
 
   test("should execute product roadmap skill", async () => {
@@ -196,6 +210,7 @@ describe("PM-Skills", () => {
     assert.ok(result.recommendations);
     assert.ok(result.kpis);
     assert.ok(result.timestamp);
+    assert.match(String((roadmap.vision as Record<string, unknown>).statement), /Become market leader/i);
   });
 
   test("should execute metrics definition skill", async () => {
@@ -217,6 +232,8 @@ describe("PM-Skills", () => {
     assert.ok(result.recommendations);
     assert.ok(result.implementation);
     assert.ok(result.timestamp);
+    const primary = ((metrics.kpis as Record<string, unknown>).primary as Array<Record<string, unknown>>);
+    assert.ok(primary.some((item) => String(item.metric).includes("monthly_recurring_growth")));
   });
 
   test("should run comprehensive product analysis", async () => {
@@ -239,6 +256,8 @@ describe("PM-Skills", () => {
     assert.ok(Array.isArray(result.summary.recommendations));
     assert.ok(Array.isArray(result.summary.risks));
     assert.ok(Array.isArray(result.summary.opportunities));
+    assert.ok(result.summary.keyInsights.length <= 12);
+    assert.ok(result.summary.recommendations.length <= 12);
   });
 
   test("should handle invalid skill names", async () => {
