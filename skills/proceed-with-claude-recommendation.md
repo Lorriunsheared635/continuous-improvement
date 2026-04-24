@@ -103,6 +103,8 @@ Emit one line per item: `Done: <item>. Verified: <actual check + output snippet>
 
 "Should work" is NOT verification. If verification is impossible, explicitly mark the item as unverified and explain why — do not claim done.
 
+**Verification is per-item and non-transitive.** A later item's broader check (e.g. an end-to-end test exercising a mid-stack route) never retroactively verifies an earlier item. If item #2 has a 3-minute typecheck and item #3 would exercise the same code path, you still run #2's typecheck before moving on. Coverage-at-the-suite-level is not a substitute for per-item proof.
+
 ## Phase 5: Iterate (Law 6 — One Change → Verify → Next)
 
 If verification fails:
@@ -145,14 +147,23 @@ Stop immediately on any of:
 - Context >80% full — write a Context Bridge before clearing
 - Any drive-by temptation that is NOT in the original list
 
+### Definitions (close common rationalization routes)
+
+- **Drive-by** = any edit outside the exact lines, files, or symbols named in the recommendation, even if the edit is in the same file or "obviously related." A missing null-check three lines away from a unit-test target is still a drive-by. Log it as deferred.
+- **Prior explicit authorization** (for destructive actions) = the user named the specific destructive action ("yes deploy to prod", "force-push the rebase", "drop the old table") in this turn or a prior turn. General urgency cues ("I'm in a hurry", "ship today", "just do it") are NOT authorization for any specific destructive action. Stop and ask.
+- **"Routed" item** = one that was successfully handled by a preferred skill. "Inline fallback" items are NOT second-class — they get the same verification and summary treatment.
+
 ## Red Flags — STOP and Ask
 
 - "I'll deploy to check" — run local verification instead
 - "Skip verification for speed" — smallest check is 30 seconds; unacceptable shortcut
 - "Batch these into one commit" — one concern per commit, always
-- "Also fix this drive-by thing" — log as deferred, do NOT silently implement
+- "Also fix this drive-by thing, it's only 3 lines" — log as deferred, do NOT silently implement
+- "The null check is really just part of a *good* unit test for #1" — no. It is a drive-by. See Definitions.
 - "User will probably be fine with me doing X" — X was not in the list
-- "The later step will test this anyway" — each item needs its own verification
+- "The later step will test this anyway" — no. Verification is per-item and non-transitive.
+- "#3 will exercise the same code as #2 end-to-end, so #2's typecheck is redundant" — no. Run #2's typecheck before moving on.
+- "User said they're in a hurry, that counts as authorization" — no. Urgency is not authorization. Stop. Ask.
 - "I'll proceed past the needs-approval item since the user seems in a hurry" — never. Stop. Ask.
 
 ## Common Mistakes
