@@ -95,7 +95,22 @@ Hooks capture every tool call. After ~20 observations, Claude analyzes patterns 
 
 The default install only deploys the core 7 Laws skill. Everything below is opt-in — pick what you want.
 
-### Companion skills ([`skills/`](skills/))
+### Featured companion — the recommended pairing for the 7 Laws
+
+⭐ **`proceed-with-claude-recommendation`** is the execution arm of this repo. When you say "do all of it" / "proceed with your recommendation" / "yes do it", this skill walks the list top-to-bottom under the 7 Laws, routes each item to the right specialist (`superpowers:*`, `ralph`, `workspace-surface-audit`, `simplify`, `security-review`, `schedule`, `loop`), falls back to inline behavior when a specialist isn't installed, verifies per item, and **halts on `needs-approval`** instead of barreling through. If you adopt one companion alongside the core skill, adopt this one — it's purpose-built to operationalize the laws end-to-end.
+
+Install it on its own:
+
+```bash
+SKILL=proceed-with-claude-recommendation
+mkdir -p ~/.claude/skills/$SKILL
+curl -L https://raw.githubusercontent.com/naimkatiman/continuous-improvement/main/skills/$SKILL.md \
+  -o ~/.claude/skills/$SKILL/SKILL.md
+```
+
+…or get it (and the rest below) by installing the `continuous-improvement` plugin from the marketplace.
+
+### Other companion skills ([`skills/`](skills/))
 
 Drop-in single-file skills, copy to `~/.claude/skills/<name>/SKILL.md`.
 
@@ -104,7 +119,6 @@ Drop-in single-file skills, copy to `~/.claude/skills/<name>/SKILL.md`.
 | `ralph` | Autonomous loop that executes a PRD story-by-story with quality checks between iterations | [snarktank/ralph](https://github.com/snarktank/ralph) |
 | `superpowers` | Activates task-appropriate skills automatically (brainstorming, git-worktrees, TDD, code review, etc.) | [obra/superpowers](https://github.com/obra/superpowers) |
 | `workspace-surface-audit` | Audits the active repo, MCP servers, plugins, and env, then recommends high-value skills/workflows | ECC |
-| `proceed-with-claude-recommendation` | Walks a Claude recommendation list top-to-bottom under the 7 Laws — routes each item to the right specialist skill, verifies per item, stops at approval-needed items | @naimkatiman |
 
 ### Plugin marketplace ([`plugins/`](plugins/))
 
