@@ -219,6 +219,10 @@ Fetch and follow the skill at: https://raw.githubusercontent.com/naimkatiman/con
 Research → Plan → Execute (one thing) → Verify → Reflect → Learn → Iterate
 ```
 
+<p align="center">
+  <img src="assets/diagram-7-laws-loop.jpg" alt="The 7 Laws of AI Agent Discipline — circular workflow loop" width="820" />
+</p>
+
 If your agent is skipping a step, that's the step it needs most.
 
 ---
@@ -233,6 +237,10 @@ Install:       Hooks start capturing silently. You notice nothing.
 ~50 sessions:  Instincts cross 0.5 → agent starts suggesting behaviors
 ~100 sessions: Instincts cross 0.7 → agent auto-applies what it learned
 ```
+
+<p align="center">
+  <img src="assets/diagram-mulahazah-learning.jpg" alt="Mulahazah pipeline — hooks capture, inline analysis, instinct store, confidence gate" width="820" />
+</p>
 
 ### How it works
 
@@ -304,6 +312,10 @@ cat transcript.jsonl | node bin/lint-transcript.mjs --stdin --json
 ## Plugin Architecture
 
 continuous-improvement ships as a **plugin** with three layers. Pick what you need:
+
+<p align="center">
+  <img src="assets/diagram-plugin-architecture.jpg" alt="Plugin architecture — SKILL.md, Observation Hooks, MCP Server, and the editors each layer connects to" width="820" />
+</p>
 
 ### Layer 1: Skill Only (any LLM)
 Paste SKILL.md into your system prompt. Your agent follows the 7 Laws. No tools, no hooks, no server.
@@ -404,7 +416,7 @@ To install from GitHub in Claude Code after you publish the repo:
 
 ```bash
 /plugin marketplace add <github-user>/continuous-improvement
-/plugin install continuous-improvement@continuous-improvement-dev
+/plugin install continuous-improvement@continuous-improvement
 ```
 
 Contributor-facing internals (`src/`, `bin/`, `test/`, build pipeline) are documented in [CONTRIBUTING.md](CONTRIBUTING.md#architecture).

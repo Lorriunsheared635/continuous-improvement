@@ -17,16 +17,19 @@ Generate a reflection for this session based on what happened:
 - What failed:
 - What I'd do differently:
 - Rule to add:
-- Iteration — Next best recommendation:
+- Iteration — Next best recommendations (ranked, top 3):
+  1. <primary — strongest next move>
+  2. <alternative — different angle>
+  3. <alternative — smaller/larger scope>
 ```
 
 If there's a "Rule to add", create an instinct YAML file with 0.6 starting confidence in the project's instinct directory.
 
-The "Iteration — Next best recommendation" field is the Law 6 handoff. Point to the next **core development** move — what to build, fix, refactor, or investigate next so the feature/system advances. NOT git steps (commit, push, PR), NOT verification re-runs, NOT deploy actions — those belong in the end-of-run summary.
+The "Iteration — Next best recommendations" field is the Law 6 handoff. List the **top 3 ranked** core-development moves — what to build, fix, refactor, or investigate next so the feature/system advances. Item #1 is the strongest; #2 and #3 are alternatives the user can pivot to. NOT git steps (commit, push, PR), NOT verification re-runs, NOT deploy actions — those belong in the end-of-run summary.
 
-Format: `<verb> <object at path:line> (<why, one clause grounded in current context>)`.
+Format per item: `<verb> <object at path:line> (<why, one clause grounded in current context>)`.
 
-If the goal is fully met and nothing else advances the system, write `None — goal met, stop.` Never leave this blank, never list more than one item.
+Rules: always exactly 3 distinct directions, not padding. If fewer real moves exist, fill remaining slots with `None — goal met from this angle.` If the goal is fully met across all angles, write `1. None — goal met, stop.` and omit #2 and #3.
 
 ## Step 2: Analyze Observations
 
@@ -69,7 +72,10 @@ Display all instincts for the current project + global:
 - What failed: [from this session]
 - What I'd do differently: [from this session]
 - Rule to add: [captured as instinct]
-- Iteration — Next best recommendation: [one concrete next action, or "None — goal met, stop."]
+- Iteration — Next best recommendations (ranked, top 3):
+  1. [primary core-development move]
+  2. [alternative angle]
+  3. [alternative scope]
 
 ## Learning
   NEW  [instinct-id]        [domain]  [confidence]  (from reflection)

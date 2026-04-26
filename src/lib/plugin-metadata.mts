@@ -594,7 +594,7 @@ export function getClaudePluginMarketplaceManifest(): ClaudePluginMarketplaceMan
 
 export function getClaudeRepoMarketplaceManifest(): ClaudePluginMarketplaceManifest {
   return {
-    name: `${PACKAGE_NAME}-dev`,
+    name: PACKAGE_NAME,
     description:
       "Marketplace for the Continuous Improvement Claude Code plugin.",
     owner: {

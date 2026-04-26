@@ -50,14 +50,17 @@ After non-trivial tasks:
 - What failed:
 - What I'd do differently:
 - Rule to add:
-- Iteration — Next best recommendation:
+- Iteration — Next best recommendations (ranked, top 3):
+  1. <primary — strongest next move>
+  2. <alternative — different angle, if user wants to pivot>
+  3. <alternative — smaller/larger scope, if user wants to adjust>
 ```
 
 The "Rule to add" field feeds Law 7 — it becomes an instinct with 0.6 starting confidence.
 
-The "Iteration — Next best recommendation" field feeds Law 6. It points to the next **core development** move based on the current code state — what to build, fix, refactor, or investigate next so the feature/system advances. NOT git plumbing (commit, push, PR), NOT pure CI ceremony (run tests, type-check), NOT deploy steps. Those belong in the end-of-run summary, not here.
+The "Iteration — Next best recommendations" field feeds Law 6. List the **top 3 ranked** core-development moves based on the current code state — what to build, fix, refactor, or investigate next so the feature/system advances. Item #1 is the strongest recommendation; #2 and #3 are alternative directions the user can pick from. NOT git plumbing (commit, push, PR), NOT pure CI ceremony (run tests, type-check), NOT deploy steps. Those belong in the end-of-run summary, not here.
 
-Format: `<verb> <object at path:line> (<why, one clause grounded in current context>)`.
+Format per item: `<verb> <object at path:line> (<why, one clause grounded in current context>)`.
 
 Good examples (development progression):
 - `Implement settleWeekAndPostPrizes writer for quiz source in src/scheduled.ts (real_contest writer exists; quiz path is recognized but inert)`
@@ -70,7 +73,11 @@ Anti-examples (rejected — these are workflow, not development):
 - `Run vitest` / `Run tsc` → that is verification (Law 4), already done before reporting
 - `Deploy to prod` → operational, needs-approval, never an autonomous next step
 
-If the goal is fully met and no further development advances the system, write `None — goal met, stop.` Never leave this blank, never list more than one item.
+Rules:
+- Always exactly 3 items, ranked. Not 2, not 5.
+- All 3 must be distinct directions — do not pad with rephrases of #1.
+- If fewer than 3 real moves exist, fill remaining slots with `None — goal met from this angle.` rather than inventing busywork.
+- If the goal is fully met across all angles, write `1. None — goal met, stop.` and omit #2 and #3.
 
 ## Law 6: Iterate Means One Thing
 
