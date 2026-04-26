@@ -96,8 +96,12 @@ Agent: **[Law 1: Research]**
        **[Law 5: Reflect]**
        - What worked: Migrating one file at a time with tests between each
        - What failed: Nothing — incremental approach caught issues early
+       - What I'd do differently: Verify the unchanged path (Step 5) was
+         a no-op before adding it to the plan — would have removed it from
+         the WILL list and saved a planning step
        - Rule to add: "For SDK migrations, update the service layer first,
          keep external interfaces stable, then update callers"
+       - Iteration — Next best recommendation: None — goal met, stop.
 
        Done. 4 files changed. Tests green after every step.
 ```

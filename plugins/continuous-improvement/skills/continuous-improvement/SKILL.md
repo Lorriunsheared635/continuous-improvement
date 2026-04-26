@@ -50,9 +50,27 @@ After non-trivial tasks:
 - What failed:
 - What I'd do differently:
 - Rule to add:
+- Iteration — Next best recommendation:
 ```
 
 The "Rule to add" field feeds Law 7 — it becomes an instinct with 0.6 starting confidence.
+
+The "Iteration — Next best recommendation" field feeds Law 6. It points to the next **core development** move based on the current code state — what to build, fix, refactor, or investigate next so the feature/system advances. NOT git plumbing (commit, push, PR), NOT pure CI ceremony (run tests, type-check), NOT deploy steps. Those belong in the end-of-run summary, not here.
+
+Format: `<verb> <object at path:line> (<why, one clause grounded in current context>)`.
+
+Good examples (development progression):
+- `Implement settleWeekAndPostPrizes writer for quiz source in src/scheduled.ts (real_contest writer exists; quiz path is recognized but inert)`
+- `Refactor contestModeGuard at src/routes/trading-contest.ts to share the 4-mode switch with /admin/mode (logic duplicated, drift risk)`
+- `Investigate why Saturday cron occasionally skips Week activation in src/scheduled.ts:625 (one missed run on 2026-04-19; root cause unknown)`
+- `Add server-side enforcement for the $100 new-deposit rule in real-contest entry handler (currently advisory; admin reviews post-contest)`
+
+Anti-examples (rejected — these are workflow, not development):
+- `Commit changes` / `Open PR` / `Push to origin` → belongs in summary, not here
+- `Run vitest` / `Run tsc` → that is verification (Law 4), already done before reporting
+- `Deploy to prod` → operational, needs-approval, never an autonomous next step
+
+If the goal is fully met and no further development advances the system, write `None — goal met, stop.` Never leave this blank, never list more than one item.
 
 ## Law 6: Iterate Means One Thing
 

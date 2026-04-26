@@ -604,6 +604,7 @@ function handleTool(name: string, params: Record<string, unknown>): ToolResult {
         "- **What failed:**",
         "- **What I'd do differently:**",
         "- **Rule to add:** (becomes an instinct at 0.6 confidence)",
+        "- **Iteration — Next best recommendation:** (one concrete next action, or `None — goal met, stop.`)",
       ].join("\n");
       return text(reflection);
     }

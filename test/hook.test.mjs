@@ -125,7 +125,7 @@ describe("observe.sh hook", { skip: SKIP_REASON }, () => {
         const lastObservation = JSON.parse(lines[lines.length - 1]);
         assert.equal(lastObservation.event, "tool_complete", "Should detect tool_complete event");
     });
-    it("completes within 500ms", () => {
+    it("completes within 2000ms", () => {
         const payload = JSON.stringify({
             tool_name: "Grep",
             session_id: "perf-test",
@@ -137,7 +137,8 @@ describe("observe.sh hook", { skip: SKIP_REASON }, () => {
             CLAUDE_PROJECT_DIR: "/tmp/test-project",
         });
         const elapsed = performance.now() - start;
-        // Generous budget — on Windows/Git Bash, spawning bash alone costs ~100-300ms.
-        assert.ok(elapsed < 500, `Hook should complete within 500ms (took ${elapsed.toFixed(0)}ms)`);
+        // Budget covers Windows/Git Bash overhead: bash startup + hook script + AV interception
+        // can total ~1.0–1.5s in practice on Windows. Linux/macOS typically completes in <300ms.
+        assert.ok(elapsed < 2000, `Hook should complete within 2000ms (took ${elapsed.toFixed(0)}ms)`);
     });
 });
