@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
@@ -140,5 +140,166 @@ describe("observe.sh hook", { skip: SKIP_REASON }, () => {
         // Budget covers Windows/Git Bash overhead: bash startup + hook script + AV interception
         // can total ~1.0–1.5s in practice on Windows. Linux/macOS typically completes in <300ms.
         assert.ok(elapsed < 2000, `Hook should complete within 2000ms (took ${elapsed.toFixed(0)}ms)`);
+    });
+});
+// ===========================================================================
+// three-section-close.sh — Stop hook that requires every substantive assistant
+// reply to close with What has been done / What is next / Recommendation.
+// ===========================================================================
+function runThreeSectionClose(payload, extraEnv = {}) {
+    const result = spawnSync(process.execPath, ["./three-section-close.mjs"], {
+        input: payload,
+        cwd: HOOKS_DIR,
+        env: { ...process.env, ...extraEnv },
+        encoding: "utf8",
+        timeout: 5000,
+    });
+    if (result.error)
+        throw result.error;
+    return result;
+}
+function writeAssistantTranscript(path, text) {
+    const line = JSON.stringify({
+        type: "assistant",
+        message: { content: [{ type: "text", text }] },
+    });
+    writeFileSync(path, `${line}\n`);
+}
+describe("three-section-close.mjs hook", () => {
+    let tempDir = "";
+    before(() => {
+        tempDir = join(tmpdir(), `ci-three-section-test-${Date.now()}`);
+        mkdirSync(tempDir, { recursive: true });
+    });
+    after(() => {
+        rmSync(tempDir, { recursive: true, force: true });
+    });
+    function transcriptPath(name) {
+        return join(tempDir, `${name}.jsonl`);
+    }
+    it("exits 0 with empty input", () => {
+        const result = runThreeSectionClose("");
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout, "");
+    });
+    it("exits 0 when transcript_path is missing", () => {
+        const result = runThreeSectionClose(JSON.stringify({ session_id: "x" }));
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout, "");
+    });
+    it("exits 0 when transcript file does not exist", () => {
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: join(tempDir, "missing.jsonl") }));
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout, "");
+    });
+    it("exits 0 for a short message (skip threshold)", () => {
+        const tp = transcriptPath("short");
+        writeAssistantTranscript(tp, "ok, will do.");
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: tp }));
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout.trim(), "");
+    });
+    it("blocks a long message missing all three sections", () => {
+        const tp = transcriptPath("long-missing");
+        // 700+ char body with prose but no required headings
+        const body = "Here is a long writeup of the changes I just made. ".repeat(20);
+        writeAssistantTranscript(tp, body);
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: tp }));
+        assert.equal(result.status, 0);
+        const parsed = JSON.parse(result.stdout);
+        assert.equal(parsed.decision, "block");
+        assert.match(parsed.reason ?? "", /What has been done/);
+        assert.match(parsed.reason ?? "", /What is next/);
+        assert.match(parsed.reason ?? "", /Recommendation/);
+    });
+    it("blocks a long message missing only Recommendation", () => {
+        const tp = transcriptPath("missing-rec");
+        const body = [
+            "## What has been done",
+            "Some stuff was done. ".repeat(20),
+            "## What is next",
+            "1. step\n2. step\n3. step\n4. step\n5. step",
+            "More body text. ".repeat(20),
+        ].join("\n\n");
+        writeAssistantTranscript(tp, body);
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: tp }));
+        assert.equal(result.status, 0);
+        const parsed = JSON.parse(result.stdout);
+        assert.equal(parsed.decision, "block");
+        assert.doesNotMatch(parsed.reason ?? "", /What has been done/);
+        assert.doesNotMatch(parsed.reason ?? "", /What is next/);
+        assert.match(parsed.reason ?? "", /Recommendation/);
+    });
+    it("allows a long message with all three sections present", () => {
+        const tp = transcriptPath("compliant");
+        const body = [
+            "Big summary block. ".repeat(20),
+            "## What has been done",
+            "- did the thing",
+            "## What is next",
+            "1. a\n2. b\n3. c\n4. d\n5. e",
+            "## Recommendation",
+            "1. top\n2. mid\n3. low",
+        ].join("\n\n");
+        writeAssistantTranscript(tp, body);
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: tp }));
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout.trim(), "");
+    });
+    it("allows a long message with all three sections at any heading level", () => {
+        const tp = transcriptPath("h3");
+        const body = [
+            "Filler body. ".repeat(20),
+            "### What has been done",
+            "stuff",
+            "### What is next",
+            "1. a\n2. b\n3. c\n4. d\n5. e",
+            "### Recommendation",
+            "no",
+        ].join("\n\n");
+        writeAssistantTranscript(tp, body);
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: tp }));
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout.trim(), "");
+    });
+    it("uses only the LAST assistant turn (not earlier ones)", () => {
+        const tp = transcriptPath("multi-turn");
+        const earlier = JSON.stringify({
+            type: "assistant",
+            message: {
+                content: [
+                    {
+                        type: "text",
+                        // Earlier turn that has the close — should NOT save the new one
+                        text: [
+                            "Earlier filler. ".repeat(30),
+                            "## What has been done",
+                            "## What is next",
+                            "## Recommendation",
+                        ].join("\n\n"),
+                    },
+                ],
+            },
+        });
+        const userTurn = JSON.stringify({
+            type: "user",
+            message: { content: [{ type: "text", text: "ok do more" }] },
+        });
+        const latest = JSON.stringify({
+            type: "assistant",
+            message: {
+                content: [
+                    {
+                        type: "text",
+                        text: "Latest reply with no close. ".repeat(30),
+                    },
+                ],
+            },
+        });
+        writeFileSync(tp, `${earlier}\n${userTurn}\n${latest}\n`);
+        const result = runThreeSectionClose(JSON.stringify({ transcript_path: tp }));
+        assert.equal(result.status, 0);
+        const parsed = JSON.parse(result.stdout);
+        assert.equal(parsed.decision, "block", "earlier compliant turn should not satisfy the lint for the latest non-compliant turn");
     });
 });

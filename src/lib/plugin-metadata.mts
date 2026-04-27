@@ -4,7 +4,7 @@ export const VERSION = "3.3.0";
 export const PLUGIN_MODES = ["beginner", "expert"] as const;
 
 export type PluginMode = typeof PLUGIN_MODES[number];
-export type HookType = "PreToolUse" | "PostToolUse" | "SessionStart" | "SessionEnd";
+export type HookType = "PreToolUse" | "PostToolUse" | "SessionStart" | "SessionEnd" | "Stop";
 
 export interface SchemaProperty {
   default?: boolean | number | string | string[];
@@ -442,15 +442,21 @@ export function getPluginHooksConfig(): PluginHooksConfig {
     command: "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session.sh\"",
     timeout: 5,
   };
+  const threeSectionCloseCommand = {
+    type: "command" as const,
+    command: "node \"${CLAUDE_PLUGIN_ROOT}/hooks/three-section-close.mjs\"",
+    timeout: 5,
+  };
 
   return {
     description:
-      "Observation and session lifecycle hooks for continuous-improvement.",
+      "Observation, session lifecycle, and 3-section-close discipline hooks for continuous-improvement.",
     hooks: {
       PreToolUse: [{ hooks: [observeCommand] }],
       PostToolUse: [{ hooks: [observeCommand] }],
       SessionStart: [{ hooks: [sessionCommand] }],
       SessionEnd: [{ hooks: [sessionCommand] }],
+      Stop: [{ hooks: [threeSectionCloseCommand] }],
     },
   };
 }

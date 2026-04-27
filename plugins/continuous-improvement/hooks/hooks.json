@@ -1,5 +1,5 @@
 {
-  "description": "Observation and session lifecycle hooks for continuous-improvement.",
+  "description": "Observation, session lifecycle, and 3-section-close discipline hooks for continuous-improvement.",
   "hooks": {
     "PreToolUse": [
       {
@@ -40,6 +40,17 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/three-section-close.mjs\"",
             "timeout": 5
           }
         ]
